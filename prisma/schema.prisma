@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique @map("wallet_address")
+  nombre        String?
+  email         String?
+  ubicacion     String?
+  avatar        String?
+  rol           Role     @default(BUYER)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  garments     Garment[]     @relation("SellerGarments")
+  nonces       AuthNonce[]
+  buyerTx      Transaction[] @relation("BuyerTransactions")
+  sellerTx     Transaction[] @relation("SellerTransactions")
+  ratingsGiven Rating[]      @relation("RatingsGiven")
+  ratingsRecv  Rating[]      @relation("RatingsReceived")
+  disputes     Dispute[]
+  sentMessages Message[]     @relation("SentMessages")
+  recvMessages Message[]     @relation("ReceivedMessages")
+
+  @@map("users")
+}
+
+model AuthNonce {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  nonce     String   @unique
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_nonces")
+}
+
+model Garment {
+  id                 String             @id @default(uuid())
+  titulo             String
+  descripcion        String?
+  marca              String?
+  talla              String?
+  categoria          String?
+  estilo             String?
+  precio             Float
+  estado             GarmentStatus      @default(PENDING)
+  sellerId           String             @map("seller_id")
+  imagenes           String[]
+  nftTokenId         String?            @map("nft_token_id")
+  verificationStatus VerificationStatus @default(PENDING) @map("verification_status")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  seller       User          @relation("SellerGarments", fields: [sellerId], references: [id])
+  verification Verification?
+  transactions Transaction[]
+
+  @@map("garments")
+}
+
+model Verification {
+  id                    String   @id @default(uuid())
+  garmentId             String   @unique @map("garment_id")
+  aiScore               Float?   @map("ai_score")
+  authenticityPct       Float?   @map("authenticity_pct")
+  wearLevel             String?  @map("wear_level")
+  dictamen              String?
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  garment Garment @relation(fields: [garmentId], references: [id], onDelete: Cascade)
+
+  @@map("verifications")
+}
+
+model Transaction {
+  id           String            @id @default(uuid())
+  buyerId      String            @map("buyer_id")
+  sellerId     String            @map("seller_id")
+  garmentId    String            @map("garment_id")
+  amount       Float
+  escrowTxHash String?           @map("escrow_tx_hash")
+  status       TransactionStatus @default(PENDING)
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  buyer   User    @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  seller  User    @relation("SellerTransactions", fields: [sellerId], references: [id])
+  garment Garment @relation(fields: [garmentId], references: [id])
+
+  ratings  Rating[]
+  disputes Dispute[]
+  messages Message[]
+
+  @@map("transactions")
+}
+
+model Rating {
+  id            String   @id @default(uuid())
+  transactionId String   @map("transaction_id")
+  fromUserId    String   @map("from_user_id")
+  toUserId      String   @map("to_user_id")
+  score         Int
+  comment       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+  fromUser    User        @relation("RatingsGiven", fields: [fromUserId], references: [id])
+  toUser      User        @relation("RatingsReceived", fields: [toUserId], references: [id])
+
+  @@map("ratings")
+}
+
+model Dispute {
+  id            String        @id @default(uuid())
+  transactionId String        @map("transaction_id")
+  openedById    String        @map("opened_by_id")
+  reason        String
+  status        DisputeStatus @default(OPEN)
+  resolution    String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+  openedBy    User        @relation(fields: [openedById], references: [id])
+
+  @@map("disputes")
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  senderId      String   @map("sender_id")
+  receiverId    String   @map("receiver_id")
+  transactionId String?  @map("transaction_id")
+  content       String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  sender      User         @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
+
+  @@map("messages")
+}
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum GarmentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SOLD
+}
+
+enum VerificationStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  COMPLETED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
