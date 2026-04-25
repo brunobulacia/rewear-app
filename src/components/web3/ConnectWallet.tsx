@@ -35,7 +35,7 @@ export function ConnectWallet() {
     setAuthLoading(true);
     setAuthError('');
     try {
-      const result = await signIn(address, (msg) => signMessageAsync({ message: msg }));
+      const result = await signIn(address, (msg) => signMessageAsync({ account: address, message: msg }));
       setUser(result.user);
     } catch (err: unknown) {
       setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión');
