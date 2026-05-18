@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { signIn, clearAuth, getStoredUser, getStoredToken } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { User } from '@/types';
+import { Wallet, ChevronDown, LogOut, User as UserIcon, Tag, LayoutGrid } from 'lucide-react';
 
 export function ConnectWallet() {
   const { address, isConnected } = useAccount();
@@ -13,10 +14,10 @@ export function ConnectWallet() {
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser]           = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu]   = useState(false);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -26,9 +27,7 @@ export function ConnectWallet() {
       .catch(() => { clearAuth(); setUser(null); });
   }, []);
 
-  const handleConnect = () => {
-    connect({ connector: injected() });
-  };
+  const handleConnect = () => connect({ connector: injected() });
 
   const handleSignIn = async () => {
     if (!address) return;
@@ -37,7 +36,7 @@ export function ConnectWallet() {
     try {
       const result = await signIn(address, (msg) => signMessageAsync({ account: address, message: msg }));
       setUser(result.user);
-    } catch (err: unknown) {
+    } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
       setAuthLoading(false);
@@ -59,8 +58,9 @@ export function ConnectWallet() {
         <button
           onClick={handleConnect}
           disabled={isConnecting}
-          className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
+          <Wallet className="w-4 h-4" />
           {isConnecting ? 'Conectando...' : 'Conectar Billetera'}
         </button>
         {connectError && (
@@ -68,7 +68,7 @@ export function ConnectWallet() {
             {connectError.message.toLowerCase().includes('provider') ||
              connectError.message.toLowerCase().includes('not found') ||
              connectError.message.toLowerCase().includes('injected')
-              ? 'No se detectó billetera. Instalá MetaMask o activá Brave Wallet.'
+              ? 'No se detectó billetera. Instalá MetaMask.'
               : connectError.message}
           </span>
         )}
@@ -80,11 +80,11 @@ export function ConnectWallet() {
     return (
       <div className="flex flex-col items-end gap-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 font-mono">{shortAddress(address!)}</span>
+          <span className="text-sm text-slate-500 font-mono">{shortAddress(address!)}</span>
           <button
             onClick={handleSignIn}
             disabled={authLoading}
-            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             {authLoading ? 'Firmando...' : 'Iniciar Sesión'}
           </button>
@@ -100,33 +100,49 @@ export function ConnectWallet() {
     <div className="relative">
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+        className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 transition-colors"
       >
-        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs">
+        <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-semibold">
           {user?.nombre?.[0]?.toUpperCase() || '?'}
         </div>
-        <span className="hidden sm:block">{user?.nombre || shortAddress(address!)}</span>
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <span className="hidden sm:block max-w-30 truncate">
+          {user?.nombre || shortAddress(address!)}
+        </span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
       </button>
 
       {showMenu && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowMenu(false)}>
-            Mi Perfil
-          </a>
-          <a href="/sell" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowMenu(false)}>
-            Vender prenda
-          </a>
-          <a href="/catalog" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowMenu(false)}>
-            Catálogo
-          </a>
-          <hr className="my-1" />
-          <button onClick={handleDisconnect} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-            Desconectar
-          </button>
-        </div>
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+          <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100">
+              <p className="text-xs text-slate-400">Conectado como</p>
+              <p className="text-sm font-medium text-slate-900 truncate font-mono">
+                {shortAddress(address!)}
+              </p>
+            </div>
+            <div className="py-1">
+              <a href="/profile" onClick={() => setShowMenu(false)}
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                <UserIcon className="w-4 h-4 text-slate-400" /> Mi Perfil
+              </a>
+              <a href="/sell" onClick={() => setShowMenu(false)}
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                <Tag className="w-4 h-4 text-slate-400" /> Vender prenda
+              </a>
+              <a href="/catalog" onClick={() => setShowMenu(false)}
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                <LayoutGrid className="w-4 h-4 text-slate-400" /> Catálogo
+              </a>
+            </div>
+            <div className="border-t border-slate-100 py-1">
+              <button onClick={handleDisconnect}
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                <LogOut className="w-4 h-4" /> Desconectar
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

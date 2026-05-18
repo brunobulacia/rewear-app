@@ -65,3 +65,25 @@ export interface AuthState {
   token: string | null;
   user: User | null;
 }
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  createdAt: string;
+  sender: Pick<User, 'id' | 'walletAddress' | 'nombre'>;
+}
+
+export type TransactionStatus = 'CONFIRMED' | 'COMPLETED' | 'DISPUTED' | 'REFUNDED';
+
+export interface Transaction {
+  id: string;
+  status: TransactionStatus;
+  escrowTradeId: string | null;
+  escrowTxHash: string | null;
+  amountMatic: number;
+  createdAt: string;
+  garment: Pick<GarmentDetail, 'id' | 'titulo' | 'imagenes' | 'precio' | 'marca' | 'talla'>;
+  buyer: Pick<User, 'id' | 'walletAddress' | 'nombre'>;
+  seller: Pick<User, 'id' | 'walletAddress' | 'nombre'>;
+  dispute: { id: string; reason: string | null; resolvedAt: string | null } | null;
+}

@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className="min-h-screen flex flex-col bg-gray-50">
+      <body className="min-h-screen flex flex-col bg-slate-50">
         <Web3Provider>
           <Header />
           <main className="flex-1">{children}</main>
-          <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
-            <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-              ReWear © 2024 — Plataforma Descentralizada de Moda Circular
+          <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
+            <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-400">
+              ReWear © 2025 — Plataforma Descentralizada de Moda Circular
             </div>
           </footer>
         </Web3Provider>

@@ -2,43 +2,37 @@
 
 import Link from 'next/link';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
+import { Shirt } from 'lucide-react';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">RW</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Shirt className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">ReWear</span>
+            <span className="text-lg font-bold text-slate-900 tracking-tight">ReWear</span>
           </Link>
 
-          {/* Nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/catalog"
-              className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
-            >
-              Catálogo
-            </Link>
-            <Link
-              href="/sell"
-              className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
-            >
-              Vender
-            </Link>
-            <Link
-              href="/profile"
-              className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
-            >
-              Mi Perfil
-            </Link>
+          <nav className="hidden md:flex items-center gap-1">
+            {[
+              { href: '/catalog', label: 'Catálogo' },
+              { href: '/sell',    label: 'Vender' },
+              { href: '/messages', label: 'Mensajes' },
+              { href: '/profile', label: 'Mi Perfil' },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Wallet */}
           <ConnectWallet />
         </div>
       </div>

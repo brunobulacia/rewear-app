@@ -1,0 +1,69 @@
+[
+  {
+    "type": "function",
+    "name": "createAndFund",
+    "stateMutability": "payable",
+    "inputs": [
+      { "name": "seller",     "type": "address" },
+      { "name": "garmentId",  "type": "string"  },
+      { "name": "nftTokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "name": "tradeId", "type": "bytes32" }]
+  },
+  {
+    "type": "function",
+    "name": "confirmDelivery",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "tradeId", "type": "bytes32" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "openDispute",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "tradeId", "type": "bytes32" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getTradeByGarment",
+    "stateMutability": "view",
+    "inputs": [{ "name": "garmentId", "type": "string" }],
+    "outputs": [
+      { "name": "tradeId", "type": "bytes32" },
+      {
+        "name": "trade",
+        "type": "tuple",
+        "components": [
+          { "name": "buyer",      "type": "address" },
+          { "name": "seller",     "type": "address" },
+          { "name": "amount",     "type": "uint256" },
+          { "name": "state",      "type": "uint8"   },
+          { "name": "fundedAt",   "type": "uint256" },
+          { "name": "garmentId",  "type": "string"  },
+          { "name": "nftTokenId", "type": "uint256" }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TradeFunded",
+    "inputs": [
+      { "name": "tradeId",   "type": "bytes32", "indexed": true  },
+      { "name": "garmentId", "type": "string",  "indexed": false },
+      { "name": "buyer",     "type": "address", "indexed": true  },
+      { "name": "seller",    "type": "address", "indexed": true  },
+      { "name": "amount",    "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TradeCompleted",
+    "inputs": [
+      { "name": "tradeId",      "type": "bytes32", "indexed": true  },
+      { "name": "sellerAmount", "type": "uint256", "indexed": false },
+      { "name": "commission",   "type": "uint256", "indexed": false }
+    ]
+  }
+]
