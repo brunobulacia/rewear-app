@@ -149,27 +149,42 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
-          {/* NFT */}
-          {garment.nftTokenId && (
-            <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
-              <div className="flex items-center gap-2.5 text-xs text-slate-500 min-w-0">
-                <Layers className="w-4 h-4 text-indigo-500 shrink-0" />
-                <span className="shrink-0">Pasaporte NFT:</span>
-                <span className="font-mono text-slate-700 truncate">#{garment.nftTokenId}</span>
+          {/* Pasaporte digital — ID único + NFT Token */}
+          <div className="border border-indigo-200 bg-white rounded-xl overflow-hidden">
+            <div className="bg-indigo-600 px-4 py-2.5 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-indigo-200 shrink-0" />
+              <span className="text-xs font-semibold text-white uppercase tracking-wider">Pasaporte Digital</span>
+            </div>
+            <div className="px-4 py-3 space-y-3">
+              {/* ID único de la prenda — siempre visible */}
+              <div>
+                <p className="text-xs text-slate-400 mb-1">Identificador único de prenda</p>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <span className="font-mono text-xs text-slate-700 break-all select-all">{garment.id}</span>
+                </div>
               </div>
-              {NFT_CONTRACT && (
-                <a
-                  href={`https://sepolia.etherscan.io/token/${NFT_CONTRACT}?a=${garment.nftTokenId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 ml-3 inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 font-medium border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Ver en blockchain
-                </a>
+              {/* Token NFT — solo si fue minteado */}
+              {garment.nftTokenId && (
+                <div>
+                  <p className="text-xs text-slate-400 mb-1">Token NFT en blockchain</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-sm font-bold text-indigo-700">#{garment.nftTokenId}</span>
+                    {NFT_CONTRACT && (
+                      <a
+                        href={`https://sepolia.etherscan.io/token/${NFT_CONTRACT}?a=${garment.nftTokenId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 font-medium border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors shrink-0"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Ver en blockchain
+                      </a>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-          )}
+          </div>
 
           {/* Vendedor */}
           <Link
