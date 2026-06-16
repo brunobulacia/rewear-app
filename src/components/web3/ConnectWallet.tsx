@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { signIn, clearAuth, getStoredUser, getStoredToken } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { User } from '@/types';
-import { Wallet, ChevronDown, LogOut, User as UserIcon, Tag, LayoutGrid } from 'lucide-react';
+import { Wallet, ChevronDown, LogOut, User as UserIcon, Tag, LayoutGrid, ShieldCheck } from 'lucide-react';
 
 export function ConnectWallet() {
   const { address, isConnected } = useAccount();
@@ -122,18 +122,27 @@ export function ConnectWallet() {
               </p>
             </div>
             <div className="py-1">
-              <a href="/profile" onClick={() => setShowMenu(false)}
-                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                <UserIcon className="w-4 h-4 text-slate-400" /> Mi Perfil
-              </a>
-              <a href="/sell" onClick={() => setShowMenu(false)}
-                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                <Tag className="w-4 h-4 text-slate-400" /> Vender prenda
-              </a>
-              <a href="/catalog" onClick={() => setShowMenu(false)}
-                className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                <LayoutGrid className="w-4 h-4 text-slate-400" /> Catálogo
-              </a>
+              {user?.rol === 'ADMIN' ? (
+                <a href="/admin" onClick={() => setShowMenu(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                  <ShieldCheck className="w-4 h-4 text-slate-400" /> Panel de Disputas
+                </a>
+              ) : (
+                <>
+                  <a href="/profile" onClick={() => setShowMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    <UserIcon className="w-4 h-4 text-slate-400" /> Mi Perfil
+                  </a>
+                  <a href="/sell" onClick={() => setShowMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    <Tag className="w-4 h-4 text-slate-400" /> Vender prenda
+                  </a>
+                  <a href="/catalog" onClick={() => setShowMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    <LayoutGrid className="w-4 h-4 text-slate-400" /> Catálogo
+                  </a>
+                </>
+              )}
             </div>
             <div className="border-t border-slate-100 py-1">
               <button onClick={handleDisconnect}

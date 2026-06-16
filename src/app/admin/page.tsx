@@ -30,7 +30,7 @@ interface Dispute {
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  CONFIRMED: { label: 'En camino',    className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  CONFIRMED: { label: 'Comprado',     className: 'bg-blue-50 text-blue-700 border-blue-200' },
   COMPLETED: { label: 'Completado',  className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   DISPUTED:  { label: 'En disputa',  className: 'bg-red-50 text-red-700 border-red-200' },
   REFUNDED:  { label: 'Reembolsado', className: 'bg-slate-100 text-slate-600 border-slate-200' },
@@ -173,7 +173,7 @@ export default function AdminPage() {
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-slate-900">{tx.amountMatic.toFixed(4)} POL</p>
+                    <p className="text-sm font-semibold text-slate-900">{(tx.amountMatic ?? 0).toFixed(4)} ETH</p>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${cfg.className}`}>{cfg.label}</span>
                   </div>
                 </div>

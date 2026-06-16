@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GarmentDetail } from '@/types';
 import { ShieldCheck, Layers, ChevronRight, Shirt, Bot, ExternalLink, User } from 'lucide-react';
+import { NftHistory } from '@/components/garment/NftHistory';
 
 const API_BASE      = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 const NFT_CONTRACT  = process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS;
@@ -185,6 +186,11 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
               )}
             </div>
           </div>
+
+          {/* Historial on-chain del NFT */}
+          {garment.nftTokenId && (
+            <NftHistory garmentId={garment.id} tokenId={garment.nftTokenId} />
+          )}
 
           {/* Vendedor */}
           <Link

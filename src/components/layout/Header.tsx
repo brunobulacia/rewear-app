@@ -1,28 +1,54 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
-import { Shirt } from 'lucide-react';
+import { getStoredUser } from '@/lib/auth';
+import { Shirt, ShieldCheck } from 'lucide-react';
+
+const USER_NAV = [
+  { href: '/catalog', label: 'Catálogo' },
+  { href: '/sell',    label: 'Vender' },
+  { href: '/verify',  label: 'Verificar' },
+  { href: '/messages', label: 'Mensajes' },
+  { href: '/profile', label: 'Mi Perfil' },
+];
+
+const ADMIN_NAV = [
+  { href: '/admin', label: 'Panel de Disputas' },
+];
 
 export function Header() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setIsAdmin(getStoredUser()?.rol === 'ADMIN');
+    sync();
+    window.addEventListener('rewear-auth', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('rewear-auth', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  const nav = isAdmin ? ADMIN_NAV : USER_NAV;
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <Shirt className="w-4 h-4 text-white" />
+              {isAdmin ? <ShieldCheck className="w-4 h-4 text-white" /> : <Shirt className="w-4 h-4 text-white" />}
             </div>
-            <span className="text-lg font-bold text-slate-900 tracking-tight">ReWear</span>
+            <span className="text-lg font-bold text-slate-900 tracking-tight">
+              ReWear{isAdmin && <span className="text-indigo-600"> · Admin</span>}
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {[
-              { href: '/catalog', label: 'Catálogo' },
-              { href: '/sell',    label: 'Vender' },
-              { href: '/messages', label: 'Mensajes' },
-              { href: '/profile', label: 'Mi Perfil' },
-            ].map(({ href, label }) => (
+            {nav.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}

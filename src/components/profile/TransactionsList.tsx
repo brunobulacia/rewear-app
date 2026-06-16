@@ -7,7 +7,7 @@ import { Transaction, TransactionStatus } from '@/types';
 import { CheckCircle, AlertTriangle, MessageCircle, Star, Shirt } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; className: string }> = {
-  CONFIRMED: { label: 'En camino',    className: 'bg-blue-50 text-blue-700 border border-blue-200' },
+  CONFIRMED: { label: 'Comprado',     className: 'bg-blue-50 text-blue-700 border border-blue-200' },
   COMPLETED: { label: 'Completado',  className: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
   DISPUTED:  { label: 'En disputa',  className: 'bg-red-50 text-red-700 border border-red-200' },
   REFUNDED:  { label: 'Reembolsado', className: 'bg-slate-100 text-slate-600 border border-slate-200' },
@@ -152,7 +152,7 @@ export function TransactionsList({ currentUserId }: Props) {
                           : `Comprador: ${tx.buyer.nombre || tx.buyer.walletAddress.slice(0, 8)}...`}
                       </p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {tx.amountMatic.toFixed(4)} POL · {new Date(tx.createdAt).toLocaleDateString('es-BO')}
+                        {tx.amountMatic.toFixed(4)} ETH · {new Date(tx.createdAt).toLocaleDateString('es-BO')}
                       </p>
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium h-fit shrink-0 ${cfg.className}`}>
@@ -185,7 +185,7 @@ export function TransactionsList({ currentUserId }: Props) {
                         <button onClick={() => handleConfirm(tx.id)} disabled={isActing}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2 rounded-lg text-xs font-semibold transition-colors">
                           <CheckCircle className="w-3.5 h-3.5" />
-                          {isActing ? 'Procesando...' : 'Confirmar entrega'}
+                          {isActing ? 'Procesando...' : 'Confirmar recepción'}
                         </button>
                       )}
                       {canDispute && (

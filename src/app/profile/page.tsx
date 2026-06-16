@@ -8,7 +8,7 @@ import { api } from '@/lib/api';
 import { User } from '@/types';
 import Link from 'next/link';
 import { TransactionsList } from '@/components/profile/TransactionsList';
-import { Wallet, ShieldCheck, Plus, Shirt } from 'lucide-react';
+import { Wallet, ShieldCheck, Plus, Shirt, Pencil, Check, X } from 'lucide-react';
 
 interface MyGarment {
   id: string;
@@ -43,6 +43,10 @@ export default function ProfilePage() {
   const [form, setForm]           = useState({ nombre: '', email: '', ubicacion: '', avatar: '' });
   const [garments, setGarments]   = useState<MyGarment[]>([]);
   const [loadingGarments, setLoadingGarments] = useState(false);
+  const [editPriceId, setEditPriceId]   = useState<string | null>(null);
+  const [priceInput, setPriceInput]     = useState('');
+  const [savingPrice, setSavingPrice]   = useState(false);
+  const [priceError, setPriceError]     = useState('');
 
   useEffect(() => {
     const stored = getStoredUser();
@@ -76,6 +80,42 @@ export default function ProfilePage() {
       console.error(err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const startEditPrice = (e: React.MouseEvent, g: MyGarment) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditPriceId(g.id);
+    setPriceInput(String(g.precio));
+    setPriceError('');
+  };
+
+  const cancelEditPrice = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditPriceId(null);
+    setPriceError('');
+  };
+
+  const savePrice = async (e: React.MouseEvent, g: MyGarment) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const nuevo = Number(priceInput);
+    if (!Number.isFinite(nuevo) || nuevo < 1) {
+      setPriceError('Precio inválido');
+      return;
+    }
+    setSavingPrice(true);
+    setPriceError('');
+    try {
+      const updated = await api.patch<MyGarment>(`/garments/${g.id}`, { precio: nuevo });
+      setGarments((prev) => prev.map((x) => (x.id === g.id ? { ...x, precio: updated.precio } : x)));
+      setEditPriceId(null);
+    } catch {
+      setPriceError('No se pudo guardar');
+    } finally {
+      setSavingPrice(false);
     }
   };
 
@@ -175,9 +215,11 @@ export default function ProfilePage() {
           {[
             { dt: 'Miembro desde', dd: user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-BO', { year: 'numeric', month: 'long', day: 'numeric' }) : '—' },
             { dt: 'Red',           dd: 'Ethereum Sepolia' },
-            { dt: 'Balance POL',   dd: balanceLoading ? '...' : balance ? `${(Number(balance.value) / 1e18).toFixed(4)} ${balance.symbol}` : '—', highlight: true },
-            { dt: 'Prendas publicadas', dd: String(garments.length) },
-            { dt: 'Prendas verificadas', dd: String(garments.filter(g => g.verificationStatus === 'APPROVED').length), highlight: true },
+            { dt: 'Balance ETH',   dd: balanceLoading ? '...' : balance ? `${(Number(balance.value) / 1e18).toFixed(4)} ${balance.symbol}` : '—', highlight: true },
+            ...(user.rol === 'ADMIN' ? [] : [
+              { dt: 'Prendas publicadas', dd: String(garments.length) },
+              { dt: 'Prendas verificadas', dd: String(garments.filter(g => g.verificationStatus === 'APPROVED').length), highlight: true },
+            ]),
           ].map(({ dt, dd, highlight }) => (
             <div key={dt} className="flex justify-between">
               <dt className="text-slate-500">{dt}</dt>
@@ -187,6 +229,9 @@ export default function ProfilePage() {
         </dl>
       </div>
 
+      {/* Comprador/Vendedor: transacciones y armario. El admin no las ve. */}
+      {user.rol !== 'ADMIN' && (
+      <>
       {/* Transacciones */}
       <TransactionsList currentUserId={user.id} />
 
@@ -239,10 +284,42 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-900 truncate">{g.titulo}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-slate-500">Bs. {g.precio}</span>
-                        {g.marca && <span className="text-xs text-slate-400">· {g.marca}</span>}
-                      </div>
+                      {editPriceId === g.id ? (
+                        <div className="flex items-center gap-1.5 mt-1" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                          <span className="text-xs text-slate-500">Bs.</span>
+                          <input
+                            type="number" min="1" value={priceInput} autoFocus
+                            onChange={(e) => setPriceInput(e.target.value)}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            className="w-24 border border-indigo-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            aria-label="Nuevo precio en bolivianos"
+                          />
+                          <button onClick={(e) => savePrice(e, g)} disabled={savingPrice}
+                            className="p-1 rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white" aria-label="Guardar precio">
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={cancelEditPrice} disabled={savingPrice}
+                            className="p-1 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-500" aria-label="Cancelar">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                          {priceError && <span className="text-xs text-red-600 ml-1">{priceError}</span>}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs text-slate-500">Bs. {g.precio}</span>
+                          {g.marca && <span className="text-xs text-slate-400">· {g.marca}</span>}
+                          <button onClick={(e) => startEditPrice(e, g)}
+                            className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 hover:underline"
+                            aria-label="Editar precio">
+                            <Pencil className="w-3 h-3" /> Editar precio
+                          </button>
+                          <Link href={`/garment/${g.id}/edit`} onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 hover:underline"
+                            aria-label="Editar prenda completa">
+                            <Pencil className="w-3 h-3" /> Editar todo
+                          </Link>
+                        </div>
+                      )}
                       {g.verificationStatus === 'APPROVED' && g.verification && (
                         <p className="text-xs text-indigo-600 mt-0.5">
                           {g.verification.authenticityPct?.toFixed(0)}% auténtico · {g.verification.wearLevel}
@@ -259,6 +336,8 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

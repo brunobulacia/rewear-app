@@ -32,7 +32,7 @@ export default async function HomePage() {
             <span className="text-indigo-600">con autenticidad garantizada.</span>
           </h1>
           <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto">
-            Cada prenda verificada por IA, tokenizada como NFT y protegida por escrow en Polygon.
+            Cada prenda verificada por IA, tokenizada como NFT y protegida por escrow en Ethereum.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -58,7 +58,7 @@ export default async function HomePage() {
             <div className="flex items-end justify-between mb-8">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Últimas prendas verificadas</h2>
-                <p className="text-slate-500 text-sm mt-1">Pasaporte digital en Polygon para cada una</p>
+                <p className="text-slate-500 text-sm mt-1">Pasaporte digital en Ethereum para cada una</p>
               </div>
               <Link href="/catalog" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
                 Ver todas <ArrowRight className="w-3.5 h-3.5" />
@@ -88,7 +88,7 @@ export default async function HomePage() {
               {
                 icon: <Layers className="w-6 h-6 text-indigo-600" />,
                 title: 'Pasaporte NFT',
-                desc: 'Cada prenda aprobada recibe un pasaporte digital inmutable en Polygon. El historial es público y verificable.',
+                desc: 'Cada prenda aprobada recibe un pasaporte digital inmutable en Ethereum. El historial es público y verificable.',
               },
               {
                 icon: <Lock className="w-6 h-6 text-indigo-600" />,

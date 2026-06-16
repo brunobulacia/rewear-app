@@ -3,9 +3,12 @@ import './globals.css';
 import { Web3Provider } from '@/providers/web3-provider';
 import { Header } from '@/components/layout/Header';
 
+
+
 export const metadata: Metadata = {
   title: 'ReWear - Moda Circular Verificada',
   description: 'Compra y vende ropa de segunda mano verificada con IA y blockchain',
+  icons : {icon: '/icon.ico'}
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

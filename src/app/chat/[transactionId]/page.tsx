@@ -86,7 +86,8 @@ export default function ChatPage() {
   const otherName = other.nombre || `${other.walletAddress.slice(0, 8)}...`;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="max-w-xl mx-auto w-full px-4 py-6">
+      <div className="flex flex-col h-[72vh] bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
         <Link href="/messages" className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -107,14 +108,14 @@ export default function ChatPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 bg-slate-50">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400">
             <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
               <Send className="w-5 h-5 text-slate-300" />
             </div>
             <p className="text-sm font-medium text-slate-500">Sin mensajes todavía</p>
-            <p className="text-xs mt-1">Coordiná los detalles del envío con {otherName}.</p>
+            <p className="text-xs mt-1">Coordiná la entrega de la prenda con {otherName}.</p>
           </div>
         ) : (
           messages.map((msg) => {
@@ -162,6 +163,7 @@ export default function ChatPage() {
           </button>
         </div>
         <p className="text-[10px] text-slate-400 mt-1.5 text-center">Enter para enviar · Shift+Enter nueva línea</p>
+      </div>
       </div>
     </div>
   );

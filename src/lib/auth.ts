@@ -22,6 +22,7 @@ export function getStoredUser(): User | null {
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('rewear-auth'));
 }
 
 export async function signIn(
@@ -43,6 +44,7 @@ export async function signIn(
   // 4. Persistir
   localStorage.setItem(TOKEN_KEY, result.token);
   localStorage.setItem(USER_KEY, JSON.stringify(result.user));
+  window.dispatchEvent(new Event('rewear-auth'));
 
   return result;
 }

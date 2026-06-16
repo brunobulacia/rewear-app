@@ -10,7 +10,10 @@ import { getStoredToken } from '@/lib/auth';
 import { useCreateAndFund, useWaitForEscrowTx } from '@/lib/escrow';
 import { GarmentDetail } from '@/types';
 
-const BOB_PER_MATIC = parseFloat(process.env.NEXT_PUBLIC_BOB_PER_MATIC || '3.5');
+// Bs por 1 ETH de Sepolia. Default alto a propósito: si la env no se setea en el
+// deploy, el monto resultante es chico (afordable en testnet). Un default bajo
+// (ej. 3.5) haría que una prenda de Bs 250 intente enviar ~71 ETH y rompa la compra.
+const BOB_PER_ETH = parseFloat(process.env.NEXT_PUBLIC_BOB_PER_ETH || '20000');
 
 type Step = 'review' | 'signing' | 'confirming' | 'registering' | 'success' | 'error';
 
@@ -69,7 +72,7 @@ export default function CheckoutPage() {
         garmentId: garment.id,
         escrowTradeId,
         escrowTxHash: receipt.transactionHash,
-        amountMatic: garment.precio / BOB_PER_MATIC,
+        amountMatic: garment.precio / BOB_PER_ETH,
       })
       .then(() => {
         setConfirmedTxHash(receipt.transactionHash);
@@ -84,14 +87,14 @@ export default function CheckoutPage() {
   const handlePay = () => {
     if (!garment || !address) return;
     const nftTokenId = garment.nftTokenId ? BigInt(garment.nftTokenId) : BigInt(0);
-    const maticStr = (garment.precio / BOB_PER_MATIC).toFixed(6);
+    const maticStr = (garment.precio / BOB_PER_ETH).toFixed(6);
     fund(garment.seller.walletAddress as `0x${string}`, garment.id, nftTokenId, maticStr);
   };
 
   const token = getStoredToken();
   const isAuthed = isConnected && !!token;
   const isBusy = step === 'signing' || step === 'confirming' || step === 'registering';
-  const maticAmount = garment ? (garment.precio / BOB_PER_MATIC).toFixed(4) : '—';
+  const maticAmount = garment ? (garment.precio / BOB_PER_ETH).toFixed(4) : '—';
 
   // ── Success ──────────────────────────────────────────────────────────────────
   if (step === 'success' && garment) {
@@ -112,7 +115,7 @@ export default function CheckoutPage() {
             Prenda: <span className="text-gray-900 font-medium">{garment.titulo}</span>
           </p>
           <p className="text-gray-500">
-            Monto: <span className="text-gray-900 font-medium">{maticAmount} POL</span>
+            Monto: <span className="text-gray-900 font-medium">{maticAmount} ETH</span>
           </p>
           {confirmedTxHash && (
             <p className="text-gray-400 font-mono text-xs truncate">
@@ -179,7 +182,7 @@ export default function CheckoutPage() {
             </div>
             <div className="text-right shrink-0">
               <p className="font-bold text-gray-900">Bs. {garment.precio.toFixed(0)}</p>
-              <p className="text-xs text-gray-400">{maticAmount} POL</p>
+              <p className="text-xs text-gray-400">{maticAmount} ETH</p>
             </div>
           </div>
           <hr className="border-gray-100" />
@@ -195,7 +198,7 @@ export default function CheckoutPage() {
             <hr className="border-gray-100" />
             <div className="flex justify-between font-bold text-gray-900">
               <span>Total a pagar</span>
-              <span>{maticAmount} POL</span>
+              <span>{maticAmount} ETH</span>
             </div>
           </div>
         </div>
@@ -262,7 +265,7 @@ export default function CheckoutPage() {
           ? 'Procesando...'
           : step === 'error'
             ? 'Reintentar'
-            : `Pagar ${maticAmount} POL con escrow`}
+            : `Pagar ${maticAmount} ETH con escrow`}
       </button>
 
       <Link

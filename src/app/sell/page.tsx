@@ -44,7 +44,10 @@ export default function SellPage() {
             setStep('approved');
             setTimeout(() => router.push(`/garment/${createdId}`), 2500);
           } else {
-            setError('La prenda no pasó la verificación de IA.');
+            const motivo = (data.verification?.dictamen || '')
+              .replace(/^RECHAZADA:\s*/i, '')
+              .trim();
+            setError(motivo || 'La imagen no parece ser una prenda de vestir.');
             setStep('error');
           }
         }
@@ -103,6 +106,24 @@ export default function SellPage() {
     );
   }
 
+  // Los administradores no publican prendas — solo gestionan disputas.
+  if (user.rol === 'ADMIN') {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-16 text-center">
+        <div className="bg-white rounded-xl border border-slate-200 p-8">
+          <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <ShieldCheck className="w-7 h-7 text-indigo-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">Cuenta de administrador</h2>
+          <p className="text-slate-500 text-sm mb-4">Los administradores no publican prendas. Tu rol es gestionar disputas.</p>
+          <a href="/admin" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
+            Ir al Panel de Disputas
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const stages = [
     { key: 'uploading', label: 'Subiendo imágenes',     icon: <Upload className="w-5 h-5" /> },
     { key: 'verifying', label: 'Verificando con IA',    icon: <Bot className="w-5 h-5" /> },
@@ -122,7 +143,7 @@ export default function SellPage() {
             <p className="text-slate-500 text-sm mb-6">Nuestra IA está analizando las imágenes para verificar autenticidad y estado.</p>
           )}
           {step === 'approved' && (
-            <p className="text-slate-500 text-sm mb-6">Prenda aprobada. Emitiendo pasaporte digital en Polygon. Redirigiendo...</p>
+            <p className="text-slate-500 text-sm mb-6">Prenda aprobada. Emitiendo pasaporte digital en Ethereum. Redirigiendo...</p>
           )}
           <div className="flex items-center justify-center gap-2 mt-6">
             {stages.map((s, i) => (
@@ -150,15 +171,21 @@ export default function SellPage() {
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-xl border border-red-200 p-8">
           <div className="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <X className="w-7 h-7 text-red-500" />
+            <Bot className="w-7 h-7 text-red-500" />
           </div>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Algo salió mal</h2>
-          <p className="text-red-600 text-sm mb-6">{error}</p>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">La IA rechazó la imagen</h2>
+          <p className="text-slate-500 text-sm mb-4">
+            Solo se pueden publicar prendas de vestir, calzado o accesorios de moda.
+          </p>
+          <div className="bg-red-50 border border-red-100 rounded-lg px-4 py-3 mb-6 text-left">
+            <p className="text-xs font-medium text-red-400 mb-1">Veredicto de la IA</p>
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
           <button
             onClick={() => { setStep('form'); setError(''); }}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
           >
-            Intentar de nuevo
+            Probar con otra imagen
           </button>
         </div>
       </div>
@@ -170,7 +197,7 @@ export default function SellPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Publicar prenda</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Subí fotos y completá los datos. La IA verificará tu prenda y se emitirá un pasaporte NFT en Polygon.
+          Subí fotos y completá los datos. La IA verificará tu prenda y se emitirá un pasaporte NFT en Ethereum.
         </p>
       </div>
 
@@ -265,7 +292,7 @@ export default function SellPage() {
           <h3 className="text-sm font-semibold text-indigo-900 mb-2">¿Qué pasa después de publicar?</h3>
           <ol className="text-xs text-indigo-700 space-y-1.5">
             <li className="flex items-start gap-2"><Bot className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span><strong>IA analiza</strong> tus fotos y verifica autenticidad y estado</span></li>
-            <li className="flex items-start gap-2"><ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>Si es aprobada, se genera un <strong>pasaporte digital NFT</strong> en Polygon</span></li>
+            <li className="flex items-start gap-2"><ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>Si es aprobada, se genera un <strong>pasaporte digital NFT</strong> en Ethereum</span></li>
             <li className="flex items-start gap-2"><Layers className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>La prenda aparece en el <strong>catálogo</strong> para compradores</span></li>
           </ol>
         </div>

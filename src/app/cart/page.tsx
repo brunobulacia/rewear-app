@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { GarmentDetail } from '@/types';
 import { ShieldCheck, Lock, ArrowLeft, ChevronRight, Shirt } from 'lucide-react';
 
-const BOB_PER_MATIC = parseFloat(process.env.NEXT_PUBLIC_BOB_PER_MATIC || '3.5');
+const BOB_PER_ETH = parseFloat(process.env.NEXT_PUBLIC_BOB_PER_ETH || '20000');
 
 function CartContent() {
   const searchParams = useSearchParams();
@@ -57,7 +57,7 @@ function CartContent() {
     );
   }
 
-  const maticAmount = (garment.precio / BOB_PER_MATIC).toFixed(4);
+  const maticAmount = (garment.precio / BOB_PER_ETH).toFixed(4);
   const mainImage   = garment.imagenes[0];
   const shortAddr   = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
@@ -96,7 +96,7 @@ function CartContent() {
           </div>
           <div className="text-right shrink-0">
             <p className="text-lg font-bold text-slate-900">Bs. {garment.precio.toFixed(0)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{maticAmount} POL</p>
+            <p className="text-xs text-slate-400 mt-0.5">{maticAmount} ETH</p>
           </div>
         </div>
 
@@ -129,9 +129,9 @@ function CartContent() {
           </div>
           <div className="border-t border-slate-100 pt-2 flex justify-between font-bold text-slate-900 text-base">
             <span>Total (en cripto)</span>
-            <span>{maticAmount} POL</span>
+            <span>{maticAmount} ETH</span>
           </div>
-          <p className="text-xs text-slate-400">1 POL ≈ Bs. {BOB_PER_MATIC.toFixed(2)} (referencial)</p>
+          <p className="text-xs text-slate-400">1 ETH ≈ Bs. {BOB_PER_ETH.toFixed(2)} (referencial)</p>
         </div>
 
         {/* Escrow info */}
