@@ -1,6 +1,7 @@
 import { Garment } from '@/types';
 import Link from 'next/link';
 import { ShieldCheck, Shirt } from 'lucide-react';
+import { FavoriteButton } from './FavoriteButton';
 
 const wearColors: Record<string, string> = {
   Excelente:   'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -36,6 +37,9 @@ export function GarmentCard({ garment }: { garment: Garment }) {
               {wearLevel}
             </div>
           )}
+          <div className="absolute bottom-2 right-2">
+            <FavoriteButton garmentId={garment.id} />
+          </div>
         </div>
 
         <div className="p-4">

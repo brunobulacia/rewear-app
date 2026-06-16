@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Transaction, TransactionStatus } from '@/types';
+import { useOpenDispute, useWaitForEscrowTx } from '@/lib/escrow';
 import { CheckCircle, AlertTriangle, MessageCircle, Star, Shirt } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; className: string }> = {
@@ -42,6 +43,13 @@ export function TransactionsList({ currentUserId }: Props) {
   const [ratingScore, setRatingScore]     = useState(0);
   const [ratingComment, setRatingComment] = useState('');
   const [ratings, setRatings]             = useState<Record<string, Rating | null>>({});
+  const [pendingDisputeTxId, setPendingDisputeTxId] = useState<string | null>(null);
+
+  // Apertura de disputa ON-CHAIN: el comprador firma openDispute(tradeId) con su
+  // billetera, lo que pone el trade en estado DISPUTED. Recién ahí la plataforma
+  // puede resolverla. Sin este paso, resolveDispute revierte ("no hay disputa").
+  const { dispute: openDisputeOnChain, hash: disputeHash, error: disputeWriteError } = useOpenDispute();
+  const { data: disputeReceipt } = useWaitForEscrowTx(disputeHash);
 
   useEffect(() => {
     api.get<Transaction[]>('/transactions/mine')
@@ -71,15 +79,34 @@ export function TransactionsList({ currentUserId }: Props) {
     } finally { setActionLoading(null); }
   };
 
-  const handleDispute = async (txId: string) => {
+  // 1) El comprador firma la apertura de disputa en el contrato (MetaMask).
+  const handleDispute = (txId: string) => {
+    const tx = transactions.find((t) => t.id === txId);
+    if (!tx?.escrowTradeId) {
+      alert('Esta compra no tiene un trade on-chain para disputar.');
+      return;
+    }
     setActionLoading(txId);
-    try {
-      await api.patch(`/transactions/${txId}/dispute`, { txHash: disputeReason });
-      setDisputeId(null); setDisputeReason(''); reload();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al abrir disputa');
-    } finally { setActionLoading(null); }
+    setPendingDisputeTxId(txId);
+    openDisputeOnChain(tx.escrowTradeId as `0x${string}`);
   };
+
+  // 2) Cuando la apertura on-chain se mina, registramos la disputa en la DB.
+  useEffect(() => {
+    if (!disputeReceipt || !pendingDisputeTxId) return;
+    api.patch(`/transactions/${pendingDisputeTxId}/dispute`, { txHash: disputeReason })
+      .then(() => { setDisputeId(null); setDisputeReason(''); reload(); })
+      .catch((err) => alert(err instanceof Error ? err.message : 'Error al registrar la disputa'))
+      .finally(() => { setPendingDisputeTxId(null); setActionLoading(null); });
+  }, [disputeReceipt, pendingDisputeTxId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Si el comprador rechaza la firma o la tx revierte
+  useEffect(() => {
+    if (!disputeWriteError) return;
+    alert('No se pudo abrir la disputa on-chain (¿rechazaste la firma?).');
+    setPendingDisputeTxId(null);
+    setActionLoading(null);
+  }, [disputeWriteError]);
 
   const handleRating = async (txId: string) => {
     if (ratingScore === 0) return;
@@ -243,14 +270,16 @@ export function TransactionsList({ currentUserId }: Props) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
             <h3 className="font-semibold text-slate-900 mb-1">Abrir disputa</h3>
-            <p className="text-sm text-slate-500 mb-4">Describí el problema. La plataforma revisará el caso.</p>
+            <p className="text-sm text-slate-500 mb-4">
+              Describí el problema. Vas a firmar la apertura de la disputa en la blockchain con tu billetera; los fondos quedan congelados hasta que la plataforma resuelva.
+            </p>
             <textarea value={disputeReason} onChange={(e) => setDisputeReason(e.target.value)}
               placeholder="Ej: La prenda no coincide con las fotos del pasaporte NFT..." rows={4}
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none mb-4" />
             <div className="flex gap-2">
               <button onClick={() => handleDispute(disputeId)} disabled={!!actionLoading}
                 className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                {actionLoading ? 'Enviando...' : 'Confirmar disputa'}
+                {actionLoading ? 'Firmá en tu billetera…' : 'Abrir disputa (firmar)'}
               </button>
               <button onClick={() => { setDisputeId(null); setDisputeReason(''); }}
                 className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-600 py-2.5 rounded-lg text-sm font-medium transition-colors">

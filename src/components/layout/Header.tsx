@@ -10,6 +10,7 @@ const USER_NAV = [
   { href: '/catalog', label: 'Catálogo' },
   { href: '/sell',    label: 'Vender' },
   { href: '/verify',  label: 'Verificar' },
+  { href: '/favorites', label: 'Favoritos' },
   { href: '/messages', label: 'Mensajes' },
   { href: '/profile', label: 'Mi Perfil' },
 ];
