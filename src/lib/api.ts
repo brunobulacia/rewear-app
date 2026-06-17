@@ -14,7 +14,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: 'Error de red' }));
-    throw new Error(error.message || `HTTP ${res.status}`);
+    const err = new Error(error.message || `HTTP ${res.status}`) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
 
   return res.json();

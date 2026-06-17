@@ -22,9 +22,22 @@ export function ConnectWallet() {
   useEffect(() => {
     const token = getStoredToken();
     if (!token) return;
+    // Mostrar la sesión guardada de inmediato (evita el "flash" de deslogueo al recargar).
+    const stored = getStoredUser();
+    if (stored) setUser(stored);
+    // Revalidar en segundo plano. SOLO desloguear si el token es inválido (401/403);
+    // ante errores de red o del servidor, mantener la sesión.
     api.get<User>('/users/me')
-      .then((u) => setUser(u))
-      .catch(() => { clearAuth(); setUser(null); });
+      .then((u) => {
+        setUser(u);
+        localStorage.setItem('rewear_user', JSON.stringify(u));
+      })
+      .catch((err: { status?: number }) => {
+        if (err?.status === 401 || err?.status === 403) {
+          clearAuth();
+          setUser(null);
+        }
+      });
   }, []);
 
   const handleConnect = () => connect({ connector: injected() });
