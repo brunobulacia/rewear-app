@@ -46,6 +46,8 @@ export default function AdminPage() {
   const [disputes, setDisputes]   = useState<Dispute[]>([]);
   const [tab, setTab]             = useState<'overview' | 'transactions' | 'disputes'>('overview');
   const [resolving, setResolving] = useState<string | null>(null);
+  const [mounted, setMounted]     = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!token) return;
@@ -55,7 +57,7 @@ export default function AdminPage() {
   }, [token]);
 
   const handleResolve = async (transactionId: string, buyerWins: boolean) => {
-    setResolving(transactionId);
+    setResolving(`${transactionId}:${buyerWins ? 'buyer' : 'seller'}`);
     try {
       await api.patch(`/admin/disputes/${transactionId}/resolve`, { buyerWins });
       const [updatedDisputes, updatedStats] = await Promise.all([
@@ -72,6 +74,14 @@ export default function AdminPage() {
   };
 
   const shortAddr = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+
+  if (!mounted) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-16 flex justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!isConnected || !user || !token) {
     return (
@@ -189,7 +199,9 @@ export default function AdminPage() {
             <div className="bg-white border border-slate-200 rounded-xl p-10 text-center text-slate-400 text-sm shadow-sm">No hay disputas pendientes.</div>
           ) : disputes.map((d) => {
             const tx = d.transaction;
-            const isResolving = resolving === tx.id;
+            const isResolvingSeller = resolving === `${tx.id}:seller`;
+            const isResolvingBuyer  = resolving === `${tx.id}:buyer`;
+            const isResolving       = isResolvingSeller || isResolvingBuyer;
             return (
               <div key={d.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
                 <div className="bg-red-50 border-b border-red-100 px-5 py-3 flex items-center justify-between">
@@ -224,11 +236,11 @@ export default function AdminPage() {
                   <div className="flex gap-2 pt-1">
                     <button onClick={() => handleResolve(tx.id, false)} disabled={isResolving}
                       className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                      {isResolving ? 'Procesando...' : 'Dar la razón al vendedor'}
+                      {isResolvingSeller ? 'Procesando...' : 'Dar la razón al vendedor'}
                     </button>
                     <button onClick={() => handleResolve(tx.id, true)} disabled={isResolving}
                       className="flex-1 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 text-slate-700 py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                      Reembolsar al comprador
+                      {isResolvingBuyer ? 'Procesando...' : 'Reembolsar al comprador'}
                     </button>
                   </div>
                 </div>

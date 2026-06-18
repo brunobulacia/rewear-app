@@ -24,6 +24,8 @@ export function CatalogFilters() {
     if (categoria) params.set('categoria', categoria);
     if (talla)     params.set('talla',     talla);
     if (precioMax) params.set('precioMax', precioMax);
+    const sort = searchParams.get('sort');
+    if (sort)      params.set('sort',      sort); // conservar el orden elegido
     router.push(`/catalog?${params.toString()}`);
   };
 

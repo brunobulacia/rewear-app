@@ -9,6 +9,12 @@ export interface User {
   createdAt: string;
 }
 
+export interface Reputation {
+  ratingAvg: number | null;
+  ratingCount: number;
+  salesCount: number;
+}
+
 export interface Verification {
   wearLevel: string | null;
   authenticityPct: number | null;
@@ -34,7 +40,7 @@ export interface GarmentDetail {
   verificationStatus: 'PENDING' | 'IN_PROGRESS' | 'APPROVED' | 'REJECTED';
   nftTokenId: string | null;
   createdAt: string;
-  seller: Pick<User, 'id' | 'walletAddress' | 'nombre' | 'avatar'>;
+  seller: Pick<User, 'id' | 'walletAddress' | 'nombre' | 'avatar'> & Partial<Reputation>;
   verification: VerificationDetail | null;
 }
 

@@ -33,15 +33,18 @@ export function NftHistory({ garmentId, tokenId }: { garmentId: string; tokenId:
   }, [garmentId]);
 
   return (
-    <div className="border border-slate-200 rounded-xl overflow-hidden">
-      <div className="bg-slate-900 px-4 py-2.5 flex items-center gap-2">
-        <Link2 className="w-4 h-4 text-indigo-300 shrink-0" />
-        <span className="text-xs font-semibold text-white uppercase tracking-wider">
-          Historial on-chain · NFT #{tokenId}
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <header className="flex items-center gap-2.5 mb-4">
+        <span className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <Link2 className="w-4 h-4" />
         </span>
-      </div>
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 leading-tight">Historial on-chain</h3>
+          <p className="text-xs text-slate-400">Trazabilidad del NFT #{tokenId}</p>
+        </div>
+      </header>
 
-      <div className="p-4">
+      <div>
         {loading ? (
           <div className="flex items-center justify-center gap-2 py-6 text-slate-400 text-sm">
             <Loader2 className="w-4 h-4 animate-spin" /> Consultando la blockchain…

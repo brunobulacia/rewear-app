@@ -36,6 +36,8 @@ export default function EditGarmentPage() {
   const [saved, setSaved]     = useState(false);
   const [error, setError]     = useState('');
   const [notOwner, setNotOwner] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     api.get<GarmentDetail>(`/garments/${id}`)
@@ -87,6 +89,14 @@ export default function EditGarmentPage() {
       setSaving(false);
     }
   };
+
+  if (!mounted) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 flex justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (

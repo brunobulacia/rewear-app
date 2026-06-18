@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { GarmentCard } from '@/components/catalog/GarmentCard';
 import { CatalogFilters } from '@/components/catalog/CatalogFilters';
+import { SortSelect } from '@/components/catalog/SortSelect';
 import { Garment, PaginatedResponse } from '@/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
@@ -12,6 +13,7 @@ interface CatalogPageProps {
     talla?: string;
     precioMin?: string;
     precioMax?: string;
+    sort?: string;
     page?: string;
   }>;
 }
@@ -41,6 +43,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   if (params.talla) filterParams.talla = params.talla;
   if (params.precioMin) filterParams.precioMin = params.precioMin;
   if (params.precioMax) filterParams.precioMax = params.precioMax;
+  if (params.sort) filterParams.sort = params.sort;
   filterParams.page = params.page || '1';
 
   const { data: garments, meta } = await fetchGarments(filterParams);
@@ -49,12 +52,17 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Catálogo</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          {meta.total} prenda{meta.total !== 1 ? 's' : ''} verificada{meta.total !== 1 ? 's' : ''}
-          {hasFilters && ' · Resultados filtrados'}
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Catálogo</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {meta.total} prenda{meta.total !== 1 ? 's' : ''} verificada{meta.total !== 1 ? 's' : ''}
+            {hasFilters && ' · Resultados filtrados'}
+          </p>
+        </div>
+        <Suspense>
+          <SortSelect />
+        </Suspense>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

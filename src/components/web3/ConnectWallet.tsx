@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { signIn, clearAuth, getStoredUser, getStoredToken } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { User } from '@/types';
+import { OnboardingModal } from '@/components/OnboardingModal';
 import { Wallet, ChevronDown, LogOut, User as UserIcon, Tag, LayoutGrid, ShieldCheck } from 'lucide-react';
 
 export function ConnectWallet() {
@@ -18,6 +19,11 @@ export function ConnectWallet() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [showMenu, setShowMenu]   = useState(false);
+  // Evita el desajuste de hidratación: en SSR la wallet siempre figura como
+  // desconectada, pero al hidratar wagmi ya reconectó. Renderizamos un placeholder
+  // estable hasta montar en el cliente.
+  const [mounted, setMounted]     = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -65,6 +71,15 @@ export function ConnectWallet() {
 
   const shortAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
+  // Placeholder estable durante SSR / antes de montar (evita hydration mismatch).
+  if (!mounted) {
+    return (
+      <div className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium opacity-80">
+        <Wallet className="w-4 h-4" /> Conectar Billetera
+      </div>
+    );
+  }
+
   if (!isConnected) {
     return (
       <div className="flex flex-col items-end gap-1">
@@ -109,8 +124,13 @@ export function ConnectWallet() {
     );
   }
 
+  const needsOnboarding = !!user && !user.nombre && user.rol !== 'ADMIN';
+
   return (
     <div className="relative">
+      {needsOnboarding && (
+        <OnboardingModal user={user!} onComplete={(u) => setUser(u)} />
+      )}
       <button
         onClick={() => setShowMenu(!showMenu)}
         className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 transition-colors"

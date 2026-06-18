@@ -31,6 +31,11 @@ export default function SellPage() {
     titulo: '', descripcion: '', marca: '', talla: '', categoria: '', estilo: '', precio: '',
   });
 
+  // Evita el desajuste de hidratación: el estado de la wallet/sesión solo existe
+  // en el cliente. Renderizamos un placeholder estable hasta montar.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (step !== 'verifying' || !createdId) return;
     const interval = setInterval(async () => {
@@ -91,6 +96,15 @@ export default function SellPage() {
       setStep('error');
     }
   };
+
+  // Placeholder estable durante SSR / antes de montar (evita hydration mismatch).
+  if (!mounted) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-16 flex justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!isConnected || !user || !token) {
     return (
@@ -193,7 +207,7 @@ export default function SellPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Publicar prenda</h1>
         <p className="text-slate-500 text-sm mt-1">
@@ -201,7 +215,10 @@ export default function SellPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+        {/* Columna izquierda: fotos + qué pasa después */}
+        <div className="space-y-5 lg:sticky lg:top-8">
         {/* Upload */}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h2 className="font-semibold text-slate-900 mb-1">Fotos de la prenda</h2>
@@ -233,6 +250,19 @@ export default function SellPage() {
           )}
         </div>
 
+        {/* Info: qué pasa después */}
+        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-indigo-900 mb-2">¿Qué pasa después de publicar?</h3>
+          <ol className="text-xs text-indigo-700 space-y-1.5">
+            <li className="flex items-start gap-2"><Bot className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span><strong>IA analiza</strong> tus fotos y verifica autenticidad y estado</span></li>
+            <li className="flex items-start gap-2"><ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>Si es aprobada, se genera un <strong>pasaporte digital NFT</strong> en Ethereum</span></li>
+            <li className="flex items-start gap-2"><Layers className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>La prenda aparece en el <strong>catálogo</strong> para compradores</span></li>
+          </ol>
+        </div>
+        </div>{/* fin columna izquierda */}
+
+        {/* Columna derecha: datos + envío */}
+        <div className="space-y-5">
         {/* Datos */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
           <h2 className="font-semibold text-slate-900">Datos de la prenda</h2>
@@ -287,16 +317,6 @@ export default function SellPage() {
           </div>
         </div>
 
-        {/* Info */}
-        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-indigo-900 mb-2">¿Qué pasa después de publicar?</h3>
-          <ol className="text-xs text-indigo-700 space-y-1.5">
-            <li className="flex items-start gap-2"><Bot className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span><strong>IA analiza</strong> tus fotos y verifica autenticidad y estado</span></li>
-            <li className="flex items-start gap-2"><ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>Si es aprobada, se genera un <strong>pasaporte digital NFT</strong> en Ethereum</span></li>
-            <li className="flex items-start gap-2"><Layers className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>La prenda aparece en el <strong>catálogo</strong> para compradores</span></li>
-          </ol>
-        </div>
-
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
             <X className="w-4 h-4 shrink-0" /> {error}
@@ -306,6 +326,8 @@ export default function SellPage() {
         <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
           Publicar y verificar prenda
         </button>
+        </div>{/* fin columna derecha */}
+        </div>{/* fin grid */}
       </form>
     </div>
   );

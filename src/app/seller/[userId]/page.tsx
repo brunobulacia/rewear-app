@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, Star, Package, ChevronRight, Shirt } from 'lucide-react';
+import { ShieldCheck, Star, Package, ChevronRight, Shirt, ShoppingBag } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
@@ -21,6 +21,9 @@ interface SellerProfile {
   rol: string;
   createdAt: string;
   garments: SellerGarment[];
+  ratingAvg: number | null;
+  ratingCount: number;
+  salesCount: number;
 }
 
 interface RatingsData {
@@ -109,9 +112,9 @@ export default async function SellerPage({ params }: { params: Promise<{ userId:
         {/* Stats */}
         <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100">
           {[
-            { label: 'Prendas activas', value: seller.garments.length, icon: <Package className="w-4 h-4" /> },
-            { label: 'Calificación',    value: ratingsData.avg ? ratingsData.avg.toFixed(1) : '—', icon: <Star className="w-4 h-4" /> },
-            { label: 'Miembro desde',  value: memberSince, icon: <ShieldCheck className="w-4 h-4" /> },
+            { label: 'Prendas activas',    value: seller.garments.length, icon: <Package className="w-4 h-4" /> },
+            { label: 'Ventas concretadas', value: seller.salesCount ?? 0, icon: <ShoppingBag className="w-4 h-4" /> },
+            { label: 'Miembro desde',      value: memberSince, icon: <ShieldCheck className="w-4 h-4" /> },
           ].map(({ label, value, icon }) => (
             <div key={label} className="px-6 py-4 text-center">
               <div className="flex items-center justify-center gap-1.5 text-slate-400 mb-1">{icon}<span className="text-xs">{label}</span></div>

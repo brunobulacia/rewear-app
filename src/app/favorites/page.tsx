@@ -13,6 +13,8 @@ export default function FavoritesPage() {
   const { isConnected } = useAccount();
   const [garments, setGarments] = useState<Garment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!getStoredToken()) { setLoading(false); return; }
@@ -21,6 +23,14 @@ export default function FavoritesPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  if (!mounted) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 flex justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!isConnected || !getStoredToken()) {
     return (

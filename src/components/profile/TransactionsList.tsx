@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Transaction, TransactionStatus } from '@/types';
 import { useOpenDispute, useWaitForEscrowTx } from '@/lib/escrow';
-import { CheckCircle, AlertTriangle, MessageCircle, Star, Shirt } from 'lucide-react';
+import { CheckCircle, AlertTriangle, MessageCircle, Star, Shirt, Clock, XCircle } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; className: string }> = {
   CONFIRMED: { label: 'Comprado',     className: 'bg-blue-50 text-blue-700 border border-blue-200' },
@@ -44,6 +44,7 @@ export function TransactionsList({ currentUserId }: Props) {
   const [ratingComment, setRatingComment] = useState('');
   const [ratings, setRatings]             = useState<Record<string, Rating | null>>({});
   const [pendingDisputeTxId, setPendingDisputeTxId] = useState<string | null>(null);
+  const [pendingMode, setPendingMode] = useState<'dispute' | 'cancel'>('dispute');
 
   // Apertura de disputa ON-CHAIN: el comprador firma openDispute(tradeId) con su
   // billetera, lo que pone el trade en estado DISPUTED. Recién ahí la plataforma
@@ -87,16 +88,37 @@ export function TransactionsList({ currentUserId }: Props) {
       return;
     }
     setActionLoading(txId);
+    setPendingMode('dispute');
     setPendingDisputeTxId(txId);
     openDisputeOnChain(tx.escrowTradeId as `0x${string}`);
   };
 
-  // 2) Cuando la apertura on-chain se mina, registramos la disputa en la DB.
+  // Cancelar compra: misma firma on-chain (openDispute), pero la plataforma
+  // auto-reembolsa al instante. La prenda vuelve a estar disponible.
+  const handleCancel = (txId: string) => {
+    const tx = transactions.find((t) => t.id === txId);
+    if (!tx?.escrowTradeId) {
+      alert('Esta compra no tiene un trade on-chain para cancelar.');
+      return;
+    }
+    if (!confirm('¿Cancelar la compra? Se te reembolsará el pago y la prenda volverá a estar disponible. Vas a firmar la cancelación en tu billetera.')) return;
+    setActionLoading(txId);
+    setPendingMode('cancel');
+    setPendingDisputeTxId(txId);
+    openDisputeOnChain(tx.escrowTradeId as `0x${string}`);
+  };
+
+  // 2) Cuando la firma on-chain se mina, registramos disputa o cancelación en la DB.
   useEffect(() => {
     if (!disputeReceipt || !pendingDisputeTxId) return;
-    api.patch(`/transactions/${pendingDisputeTxId}/dispute`, { txHash: disputeReason })
+    const isCancel = pendingMode === 'cancel';
+    const endpoint = isCancel ? 'cancel' : 'dispute';
+    const body = isCancel
+      ? { txHash: disputeHash ?? '' }
+      : { txHash: disputeHash ?? '', reason: disputeReason.trim() || undefined };
+    api.patch(`/transactions/${pendingDisputeTxId}/${endpoint}`, body)
       .then(() => { setDisputeId(null); setDisputeReason(''); reload(); })
-      .catch((err) => alert(err instanceof Error ? err.message : 'Error al registrar la disputa'))
+      .catch((err) => alert(err instanceof Error ? err.message : `Error al ${isCancel ? 'cancelar' : 'registrar la disputa'}`))
       .finally(() => { setPendingDisputeTxId(null); setActionLoading(null); });
   }, [disputeReceipt, pendingDisputeTxId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -157,9 +179,14 @@ export function TransactionsList({ currentUserId }: Props) {
               const isBuyer    = tx.buyer.id === currentUserId;
               const canConfirm = isBuyer && tx.status === 'CONFIRMED';
               const canDispute = isBuyer && tx.status === 'CONFIRMED';
+              const canCancel  = isBuyer && tx.status === 'CONFIRMED';
               const canRate    = isBuyer && tx.status === 'COMPLETED' && !ratings[tx.id];
               const rated      = ratings[tx.id];
               const isActing   = actionLoading === tx.id;
+              const daysPending = tx.status === 'CONFIRMED'
+                ? Math.floor((Date.now() - new Date(tx.createdAt).getTime()) / 86_400_000)
+                : 0;
+              const isStale = isBuyer && daysPending >= 7;
 
               return (
                 <div key={tx.id} className="border border-slate-200 rounded-xl p-4 space-y-3">
@@ -205,9 +232,20 @@ export function TransactionsList({ currentUserId }: Props) {
                     <MessageCircle className="w-3.5 h-3.5" /> Abrir chat
                   </Link>
 
+                  {/* Aviso de compra pendiente hace mucho (vencimiento) */}
+                  {isStale && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-start gap-2 text-xs text-amber-700">
+                      <Clock className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                      <span>
+                        Compra pendiente hace {daysPending} días. Si el vendedor no concretó la entrega,
+                        podés <strong>cancelar</strong> para recuperar tu pago.
+                      </span>
+                    </div>
+                  )}
+
                   {/* Acciones */}
                   {(canConfirm || canDispute) && (
-                    <div className="flex gap-2 pt-1">
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {canConfirm && (
                         <button onClick={() => handleConfirm(tx.id)} disabled={isActing}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2 rounded-lg text-xs font-semibold transition-colors">
@@ -219,6 +257,12 @@ export function TransactionsList({ currentUserId }: Props) {
                         <button onClick={() => setDisputeId(tx.id)} disabled={isActing}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 text-slate-600 py-2 rounded-lg text-xs font-semibold transition-colors">
                           <AlertTriangle className="w-3.5 h-3.5" /> Disputar
+                        </button>
+                      )}
+                      {canCancel && (
+                        <button onClick={() => handleCancel(tx.id)} disabled={isActing}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600 disabled:opacity-50 text-slate-500 py-2 rounded-lg text-xs font-semibold transition-colors">
+                          <XCircle className="w-3.5 h-3.5" /> Cancelar compra
                         </button>
                       )}
                     </div>
