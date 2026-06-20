@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Transaction, TransactionStatus } from '@/types';
-import { useOpenDispute, useWaitForEscrowTx } from '@/lib/escrow';
+import { useOpenDispute, useConfirmDelivery, useWaitForEscrowTx } from '@/lib/escrow';
 import { CheckCircle, AlertTriangle, MessageCircle, Star, Shirt, Clock, XCircle } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; className: string }> = {
@@ -45,12 +45,18 @@ export function TransactionsList({ currentUserId }: Props) {
   const [ratings, setRatings]             = useState<Record<string, Rating | null>>({});
   const [pendingDisputeTxId, setPendingDisputeTxId] = useState<string | null>(null);
   const [pendingMode, setPendingMode] = useState<'dispute' | 'cancel'>('dispute');
+  const [pendingConfirmTxId, setPendingConfirmTxId] = useState<string | null>(null);
 
   // Apertura de disputa ON-CHAIN: el comprador firma openDispute(tradeId) con su
   // billetera, lo que pone el trade en estado DISPUTED. Recién ahí la plataforma
   // puede resolverla. Sin este paso, resolveDispute revierte ("no hay disputa").
   const { dispute: openDisputeOnChain, hash: disputeHash, error: disputeWriteError } = useOpenDispute();
   const { data: disputeReceipt } = useWaitForEscrowTx(disputeHash);
+
+  // Confirmar entrega ON-CHAIN: el comprador firma confirmDelivery(tradeId), que
+  // libera el pago retenido al vendedor. Recién después registramos el hash real.
+  const { confirm: confirmDeliveryOnChain, hash: confirmHash, error: confirmWriteError } = useConfirmDelivery();
+  const { data: confirmReceipt } = useWaitForEscrowTx(confirmHash);
 
   useEffect(() => {
     api.get<Transaction[]>('/transactions/mine')
@@ -70,14 +76,17 @@ export function TransactionsList({ currentUserId }: Props) {
     api.get<Transaction[]>('/transactions/mine').then(setTransactions).catch(() => {});
   };
 
-  const handleConfirm = async (txId: string) => {
+  // El comprador firma confirmDelivery on-chain (libera el escrow al vendedor);
+  // al minarse registramos el hash real en la DB (ver useEffect más abajo).
+  const handleConfirm = (txId: string) => {
+    const tx = transactions.find((t) => t.id === txId);
+    if (!tx?.escrowTradeId) {
+      alert('Esta compra no tiene un trade on-chain para confirmar.');
+      return;
+    }
     setActionLoading(txId);
-    try {
-      await api.patch(`/transactions/${txId}/confirm`, { txHash: '' });
-      reload();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al confirmar');
-    } finally { setActionLoading(null); }
+    setPendingConfirmTxId(txId);
+    confirmDeliveryOnChain(tx.escrowTradeId as `0x${string}`);
   };
 
   // 1) El comprador firma la apertura de disputa en el contrato (MetaMask).
@@ -129,6 +138,22 @@ export function TransactionsList({ currentUserId }: Props) {
     setPendingDisputeTxId(null);
     setActionLoading(null);
   }, [disputeWriteError]);
+
+  // Confirmar entrega: al minarse la firma on-chain, registramos el hash real.
+  useEffect(() => {
+    if (!confirmReceipt || !pendingConfirmTxId) return;
+    api.patch(`/transactions/${pendingConfirmTxId}/confirm`, { txHash: confirmHash ?? '' })
+      .then(() => reload())
+      .catch((err) => alert(err instanceof Error ? err.message : 'Error al confirmar'))
+      .finally(() => { setPendingConfirmTxId(null); setActionLoading(null); });
+  }, [confirmReceipt, pendingConfirmTxId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!confirmWriteError) return;
+    alert('No se pudo confirmar la entrega on-chain (¿rechazaste la firma?).');
+    setPendingConfirmTxId(null);
+    setActionLoading(null);
+  }, [confirmWriteError]);
 
   const handleRating = async (txId: string) => {
     if (ratingScore === 0) return;
@@ -250,7 +275,7 @@ export function TransactionsList({ currentUserId }: Props) {
                         <button onClick={() => handleConfirm(tx.id)} disabled={isActing}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2 rounded-lg text-xs font-semibold transition-colors">
                           <CheckCircle className="w-3.5 h-3.5" />
-                          {isActing ? 'Procesando...' : 'Confirmar recepción'}
+                          {pendingConfirmTxId === tx.id ? 'Confirmá en tu billetera…' : isActing ? 'Procesando...' : 'Confirmar recepción'}
                         </button>
                       )}
                       {canDispute && (
