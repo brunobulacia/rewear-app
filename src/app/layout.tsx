@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Web3Provider } from '@/providers/web3-provider';
 import { Header } from '@/components/layout/Header';
+import { TermsModal } from '@/components/TermsModal';
 
 
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className="min-h-screen flex flex-col bg-slate-50">
         <Web3Provider>
+          <TermsModal />
           <Header />
           <main className="flex-1">{children}</main>
           <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
