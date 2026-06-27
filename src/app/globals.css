@@ -1,1 +1,113 @@
 @import "tailwindcss";
+
+/* Habilita el modo oscuro por clase (.dark en <html>) además del `dark:` de Tailwind. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Modo oscuro sin tocar los ~977 usos de color de la app: como las clases de
+ * Tailwind son CSS real, remapeamos la PALETA NEUTRA (slate/gray/white) bajo
+ * `.dark`. Los acentos (indigo/emerald/red/amber) se mantienen: contrastan bien
+ * sobre oscuro. `text-white` NO se remapea (vive sobre botones de color).
+ *
+ * Las reglas van sin @layer: el CSS no-capado gana sobre las utilidades de
+ * Tailwind (que sí están en capas), así que sobreescriben sin !important.
+ */
+.dark {
+  color-scheme: dark;
+
+  --rw-bg:        #0b1120; /* fondo de página */
+  --rw-surface:   #161d2e; /* tarjetas / paneles */
+  --rw-surface-2: #1e2738; /* superficies sutiles (slate-100) */
+  --rw-surface-3: #273245; /* slate-200 */
+  --rw-border:    #2a3447;
+  --rw-border-2:  #222b3c;
+  --rw-text:      #e8edf5; /* títulos */
+  --rw-text-2:    #c2ccdb; /* texto secundario */
+  --rw-muted:     #93a1b5; /* slate-500 */
+  --rw-faint:     #6b7689; /* slate-400/300 */
+}
+
+/* Fondos */
+.dark .bg-white      { background-color: var(--rw-surface); }
+.dark .bg-slate-50,
+.dark .bg-gray-50    { background-color: var(--rw-bg); }
+.dark .bg-slate-100,
+.dark .bg-gray-100   { background-color: var(--rw-surface-2); }
+.dark .bg-slate-200  { background-color: var(--rw-surface-3); }
+
+/* Texto */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-gray-900 { color: var(--rw-text); }
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-gray-700,
+.dark .text-gray-600 { color: var(--rw-text-2); }
+.dark .text-slate-500,
+.dark .text-gray-500 { color: var(--rw-muted); }
+.dark .text-slate-400,
+.dark .text-slate-300,
+.dark .text-slate-200,
+.dark .text-gray-400 { color: var(--rw-faint); }
+
+/* Bordes y divisores */
+.dark .border-slate-200,
+.dark .border-gray-200 { border-color: var(--rw-border); }
+.dark .border-slate-100,
+.dark .border-gray-100 { border-color: var(--rw-border-2); }
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--rw-border-2); }
+.dark .divide-slate-50  > :not([hidden]) ~ :not([hidden]) { border-color: var(--rw-border-2); }
+
+/* Placeholders */
+.dark .placeholder\:text-slate-400::placeholder { color: var(--rw-faint); }
+
+/* Estados hover/disabled neutros más usados */
+.dark .hover\:bg-slate-50:hover  { background-color: var(--rw-surface-2); }
+.dark .hover\:bg-slate-100:hover { background-color: var(--rw-surface-3); }
+.dark .hover\:text-slate-900:hover { color: var(--rw-text); }
+.dark .hover\:text-slate-700:hover { color: var(--rw-text-2); }
+.dark .hover\:border-slate-300:hover { border-color: var(--rw-faint); }
+.dark .disabled\:bg-slate-50:disabled  { background-color: var(--rw-surface-2); }
+.dark .disabled\:bg-slate-100:disabled { background-color: var(--rw-surface-3); }
+
+/*
+ * Acentos tenues (callouts, badges, alertas): los fondos -50/-100 y bordes -200
+ * quedarían como parches claros en oscuro. Los pasamos a tintes translúcidos del
+ * mismo color (funcionan sobre cualquier superficie) y aclaramos el texto de
+ * acento oscuro (-600/-700/-800/-900) para que contraste. Los botones sólidos
+ * (bg-indigo-600 + text-white) NO se tocan: se ven bien en oscuro.
+ */
+.dark .bg-indigo-50  { background-color: rgba(99,102,241,.12); }
+.dark .bg-indigo-100 { background-color: rgba(99,102,241,.18); }
+.dark .border-indigo-200 { border-color: rgba(99,102,241,.32); }
+.dark .border-indigo-100 { border-color: rgba(99,102,241,.22); }
+.dark .text-indigo-900, .dark .text-indigo-800, .dark .text-indigo-700 { color: #a5b4fc; }
+.dark .text-indigo-600 { color: #818cf8; }
+
+.dark .bg-emerald-50  { background-color: rgba(16,185,129,.12); }
+.dark .bg-emerald-100 { background-color: rgba(16,185,129,.18); }
+.dark .border-emerald-200 { border-color: rgba(16,185,129,.32); }
+.dark .border-emerald-100 { border-color: rgba(16,185,129,.22); }
+.dark .text-emerald-900, .dark .text-emerald-800, .dark .text-emerald-700 { color: #6ee7b7; }
+.dark .text-emerald-600 { color: #34d399; }
+
+.dark .bg-red-50  { background-color: rgba(239,68,68,.12); }
+.dark .bg-red-100 { background-color: rgba(239,68,68,.18); }
+.dark .border-red-200 { border-color: rgba(239,68,68,.32); }
+.dark .border-red-100 { border-color: rgba(239,68,68,.22); }
+.dark .text-red-900, .dark .text-red-800, .dark .text-red-700 { color: #fca5a5; }
+.dark .text-red-600, .dark .text-red-500 { color: #f87171; }
+
+.dark .bg-amber-50  { background-color: rgba(245,158,11,.12); }
+.dark .bg-amber-100 { background-color: rgba(245,158,11,.18); }
+.dark .border-amber-200 { border-color: rgba(245,158,11,.32); }
+.dark .border-amber-100 { border-color: rgba(245,158,11,.22); }
+.dark .text-amber-900, .dark .text-amber-800, .dark .text-amber-700 { color: #fcd34d; }
+
+.dark .bg-blue-50  { background-color: rgba(59,130,246,.12); }
+.dark .bg-blue-100 { background-color: rgba(59,130,246,.18); }
+.dark .border-blue-200 { border-color: rgba(59,130,246,.32); }
+.dark .text-blue-900, .dark .text-blue-800, .dark .text-blue-700 { color: #93c5fd; }
+
+/* Fondo base del documento para que no quede una franja clara al hacer scroll. */
+.dark body { background-color: var(--rw-bg); }

@@ -14,8 +14,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-slate-50">
+        {/* Anti-flash: aplica el tema guardado (o el del sistema) antes del paint,
+            como primer nodo server-rendered del body. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('rewear-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();`,
+          }}
+        />
         <Web3Provider>
           <TermsModal />
           <Header />

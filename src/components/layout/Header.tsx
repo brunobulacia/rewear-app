@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { getStoredUser } from '@/lib/auth';
 import { Shirt, ShieldCheck } from 'lucide-react';
 
@@ -60,7 +61,10 @@ export function Header() {
             ))}
           </nav>
 
-          <ConnectWallet />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <ConnectWallet />
+          </div>
         </div>
       </div>
     </header>
