@@ -1,69 +1,552 @@
 [
   {
-    "type": "function",
-    "name": "createAndFund",
-    "stateMutability": "payable",
     "inputs": [
-      { "name": "seller",     "type": "address" },
-      { "name": "garmentId",  "type": "string"  },
-      { "name": "nftTokenId", "type": "uint256" }
-    ],
-    "outputs": [{ "name": "tradeId", "type": "bytes32" }]
-  },
-  {
-    "type": "function",
-    "name": "confirmDelivery",
-    "stateMutability": "nonpayable",
-    "inputs": [{ "name": "tradeId", "type": "bytes32" }],
-    "outputs": []
-  },
-  {
-    "type": "function",
-    "name": "openDispute",
-    "stateMutability": "nonpayable",
-    "inputs": [{ "name": "tradeId", "type": "bytes32" }],
-    "outputs": []
-  },
-  {
-    "type": "function",
-    "name": "getTradeByGarment",
-    "stateMutability": "view",
-    "inputs": [{ "name": "garmentId", "type": "string" }],
-    "outputs": [
-      { "name": "tradeId", "type": "bytes32" },
       {
-        "name": "trade",
-        "type": "tuple",
-        "components": [
-          { "name": "buyer",      "type": "address" },
-          { "name": "seller",     "type": "address" },
-          { "name": "amount",     "type": "uint256" },
-          { "name": "state",      "type": "uint8"   },
-          { "name": "fundedAt",   "type": "uint256" },
-          { "name": "garmentId",  "type": "string"  },
-          { "name": "nftTokenId", "type": "uint256" }
-        ]
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
       }
-    ]
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    "type": "event",
-    "name": "TradeFunded",
     "inputs": [
-      { "name": "tradeId",   "type": "bytes32", "indexed": true  },
-      { "name": "garmentId", "type": "string",  "indexed": false },
-      { "name": "buyer",     "type": "address", "indexed": true  },
-      { "name": "seller",    "type": "address", "indexed": true  },
-      { "name": "amount",    "type": "uint256", "indexed": false }
-    ]
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
   },
   {
-    "type": "event",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "buyerWins",
+        "type": "bool"
+      }
+    ],
+    "name": "DisputeResolved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newRecipient",
+        "type": "address"
+      }
+    ],
+    "name": "FeeRecipientUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sellerAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "commission",
+        "type": "uint256"
+      }
+    ],
     "name": "TradeCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
     "inputs": [
-      { "name": "tradeId",      "type": "bytes32", "indexed": true  },
-      { "name": "sellerAmount", "type": "uint256", "indexed": false },
-      { "name": "commission",   "type": "uint256", "indexed": false }
-    ]
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "by",
+        "type": "address"
+      }
+    ],
+    "name": "TradeDisputed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "garmentId",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "buyer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TradeFunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "TradeRefunded",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DELIVERY_TIMEOUT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "commissionBps",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "confirmDelivery",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "garmentId",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "createAndFund",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeRecipient",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "garmentTrade",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getTrade",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "buyer",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum ReWearEscrow.State",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fundedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "garmentId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nftTokenId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ReWearEscrow.Trade",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "garmentId",
+        "type": "string"
+      }
+    ],
+    "name": "getTradeByGarment",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "buyer",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "seller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum ReWearEscrow.State",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fundedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "garmentId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nftTokenId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ReWearEscrow.Trade",
+        "name": "trade",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "openDispute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tradeId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "buyerWins",
+        "type": "bool"
+      }
+    ],
+    "name": "resolveDispute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newBps",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCommissionBps",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newRecipient",
+        "type": "address"
+      }
+    ],
+    "name": "setFeeRecipient",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "trades",
+    "outputs": [
+      {
+        "internalType": "address payable",
+        "name": "buyer",
+        "type": "address"
+      },
+      {
+        "internalType": "address payable",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ReWearEscrow.State",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fundedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "garmentId",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawCommissions",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]
