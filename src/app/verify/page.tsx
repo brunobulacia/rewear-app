@@ -62,7 +62,7 @@ export default function VerifyPage() {
         <h1 className="text-2xl font-bold text-slate-900">Verificar autenticidad</h1>
       </div>
       <p className="text-slate-500 text-sm mb-6">
-        Subí la foto de una prenda y comprobá si está registrada en ReWear con su pasaporte digital
+        Subí la foto de un producto y comprobá si está registrado en ReWear con su pasaporte digital
         en blockchain. Comparamos la <strong>huella digital (SHA-256)</strong> de la imagen contra
         el sistema.
       </p>
@@ -110,7 +110,7 @@ export default function VerifyPage() {
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                <h2 className="text-lg font-bold text-emerald-800">Prenda registrada ✓</h2>
+                <h2 className="text-lg font-bold text-emerald-800">Producto registrado ✓</h2>
               </div>
               <div className="flex gap-4">
                 {result.garment.imagen && (
@@ -152,7 +152,7 @@ export default function VerifyPage() {
               {result.garment.nftTokenId && (
                 <Link href={`/garment/${result.garment.id}`}
                   className="mt-4 inline-block text-sm text-indigo-600 hover:underline font-medium">
-                  Ver prenda completa →
+                  Ver producto completo →
                 </Link>
               )}
             </div>

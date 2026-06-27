@@ -112,7 +112,7 @@ export default async function SellerPage({ params }: { params: Promise<{ userId:
         {/* Stats */}
         <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100">
           {[
-            { label: 'Prendas activas',    value: seller.garments.length, icon: <Package className="w-4 h-4" /> },
+            { label: 'Productos activos',    value: seller.garments.length, icon: <Package className="w-4 h-4" /> },
             { label: 'Ventas concretadas', value: seller.salesCount ?? 0, icon: <ShoppingBag className="w-4 h-4" /> },
             { label: 'Miembro desde',      value: memberSince, icon: <ShieldCheck className="w-4 h-4" /> },
           ].map(({ label, value, icon }) => (
@@ -125,17 +125,17 @@ export default async function SellerPage({ params }: { params: Promise<{ userId:
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Prendas */}
+        {/* Productos */}
         <div className="lg:col-span-2">
           <h2 className="text-base font-semibold text-slate-900 mb-4">
-            Prendas verificadas ({seller.garments.length})
+            Productos verificados ({seller.garments.length})
           </h2>
           {seller.garments.length === 0 ? (
             <div className="bg-white rounded-xl border border-slate-200 p-10 text-center shadow-sm">
               <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Shirt className="w-6 h-6 text-slate-300" />
               </div>
-              <p className="text-slate-500 text-sm">Sin prendas activas.</p>
+              <p className="text-slate-500 text-sm">Sin productos activos.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">

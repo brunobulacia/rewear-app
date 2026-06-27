@@ -57,7 +57,7 @@ export function TermsModal() {
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">1. La plataforma</h3>
             <p>ReWear es un marketplace que conecta a compradores y vendedores de ropa de segunda mano, actuando
-            como <strong>intermediario de confianza</strong>. No es propietaria de las prendas publicadas.</p>
+            como <strong>intermediario de confianza</strong>. No es propietaria de los productos publicados.</p>
           </div>
 
           <div>
@@ -68,33 +68,33 @@ export function TermsModal() {
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">3. Compras y ventas</h3>
-            <p>Cada prenda se <strong>verifica con inteligencia artificial</strong> y recibe un pasaporte digital
+            <p>Cada producto se <strong>verifica con inteligencia artificial</strong> y recibe un pasaporte digital
             (NFT). El pago queda <strong>retenido en custodia (escrow)</strong> hasta que confirmás la entrega.
             Si surge un problema, podés abrir una <strong>disputa</strong> o cancelar para recuperar tu pago.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">4. Conductas prohibidas</h3>
-            <p>Está prohibido publicar prendas falsas o robadas, realizar fraudes o usar la plataforma para fines
+            <p>Está prohibido publicar productos falsos o robados, realizar fraudes o usar la plataforma para fines
             ilícitos. El incumplimiento puede derivar en la suspensión de la cuenta.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">5. Blockchain</h3>
-            <p>El pasaporte NFT y el historial de cada prenda quedan registrados de forma
+            <p>El pasaporte NFT y el historial de cada producto quedan registrados de forma
             <strong> pública e inmutable</strong> en la red blockchain, por lo que esa información no puede
             eliminarse.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">6. Privacidad</h3>
-            <p>Recopilamos tu dirección de billetera, nombre, correo, prendas publicadas e historial de
+            <p>Recopilamos tu dirección de billetera, nombre, correo, productos publicados e historial de
             transacciones, con el único fin de operar la plataforma y mejorar el servicio.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-1">7. Limitación de responsabilidad</h3>
-            <p>ReWear no se responsabiliza por el estado real de las prendas más allá de la verificación
+            <p>ReWear no se responsabiliza por el estado real de los productos más allá de la verificación
             automática, ni por acuerdos realizados fuera de la plataforma.</p>
           </div>
 

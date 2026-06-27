@@ -103,14 +103,14 @@ export function TransactionsList({ currentUserId }: Props) {
   };
 
   // Cancelar compra: misma firma on-chain (openDispute), pero la plataforma
-  // auto-reembolsa al instante. La prenda vuelve a estar disponible.
+  // auto-reembolsa al instante. El producto vuelve a estar disponible.
   const handleCancel = (txId: string) => {
     const tx = transactions.find((t) => t.id === txId);
     if (!tx?.escrowTradeId) {
       alert('Esta compra no tiene un trade on-chain para cancelar.');
       return;
     }
-    if (!confirm('¿Cancelar la compra? Se te reembolsará el pago y la prenda volverá a estar disponible. Vas a firmar la cancelación en tu billetera.')) return;
+    if (!confirm('¿Cancelar la compra? Se te reembolsará el pago y el producto volverá a estar disponible. Vas a firmar la cancelación en tu billetera.')) return;
     setActionLoading(txId);
     setPendingMode('cancel');
     setPendingDisputeTxId(txId);
@@ -343,7 +343,7 @@ export function TransactionsList({ currentUserId }: Props) {
               Describí el problema. Vas a firmar la apertura de la disputa en la blockchain con tu billetera; los fondos quedan congelados hasta que la plataforma resuelva.
             </p>
             <textarea value={disputeReason} onChange={(e) => setDisputeReason(e.target.value)}
-              placeholder="Ej: La prenda no coincide con las fotos del pasaporte NFT..." rows={4}
+              placeholder="Ej: El producto no coincide con las fotos del pasaporte NFT..." rows={4}
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none mb-4" />
             <div className="flex gap-2">
               <button onClick={() => handleDispute(disputeId)} disabled={!!actionLoading}

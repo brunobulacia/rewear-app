@@ -12,7 +12,7 @@ const ESCROW_ADDRESS = (process.env.NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS || '') a
 const EscrowAbi = EscrowAbiJson as Abi;
 
 // ─────────────────────────────────────────────────────────────
-//  Hook: fondear el escrow (comprar prenda)
+//  Hook: fondear el escrow (comprar producto)
 // ─────────────────────────────────────────────────────────────
 
 export function useCreateAndFund() {

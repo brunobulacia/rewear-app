@@ -115,7 +115,7 @@ export default function ChatPage() {
               <Send className="w-5 h-5 text-slate-300" />
             </div>
             <p className="text-sm font-medium text-slate-500">Sin mensajes todavía</p>
-            <p className="text-xs mt-1">Coordiná la entrega de la prenda con {otherName}.</p>
+            <p className="text-xs mt-1">Coordiná la entrega del producto con {otherName}.</p>
           </div>
         ) : (
           messages.map((msg) => {

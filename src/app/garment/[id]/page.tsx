@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { GarmentDetail } from '@/types';
+import { categoriaLabel } from '@/lib/categoria';
 import { ShieldCheck, Layers, ChevronRight, Shirt, Bot, ExternalLink, ShoppingBag, Lock } from 'lucide-react';
 import { NftHistory } from '@/components/garment/NftHistory';
 import { ReputationBadge } from '@/components/ReputationBadge';
@@ -109,7 +110,7 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
           <div>
             {garment.categoria && (
               <span className="text-xs text-indigo-600 font-semibold uppercase tracking-wider">
-                {garment.categoria}
+                {categoriaLabel(garment.categoria)}
               </span>
             )}
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 leading-tight">{garment.titulo}</h1>
@@ -135,7 +136,7 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
               </Link>
             ) : (
               <button disabled className="mt-4 w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-semibold text-sm cursor-not-allowed">
-                {garment.estado === 'SOLD' ? 'Prenda vendida' : 'No disponible'}
+                {garment.estado === 'SOLD' ? 'Producto vendido' : 'No disponible'}
               </button>
             )}
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-xs text-slate-400">
@@ -144,11 +145,14 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Atributos */}
-          {(garment.marca || garment.talla || garment.estilo) && (
+          {(garment.marca || garment.modelo || garment.colorway || garment.talla || garment.estilo || garment.condicion) && (
             <div className="flex flex-wrap gap-2.5">
               {garment.marca && <Attr label="Marca" value={garment.marca} />}
+              {garment.modelo && <Attr label="Modelo" value={garment.modelo} />}
+              {garment.colorway && <Attr label="Colorway" value={garment.colorway} />}
               {garment.talla && <Attr label="Talla" value={garment.talla} />}
               {garment.estilo && <Attr label="Estilo" value={garment.estilo} />}
+              {garment.condicion && <Attr label="Condición" value={garment.condicion} />}
             </div>
           )}
 
@@ -219,7 +223,7 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
         )}
 
         {/* Pasaporte digital */}
-        <SectionCard icon={<Layers className="w-4 h-4" />} title="Pasaporte digital" subtitle="Identidad única e inmutable de la prenda">
+        <SectionCard icon={<Layers className="w-4 h-4" />} title="Pasaporte digital" subtitle="Identidad única e inmutable del artículo">
           <div className="space-y-3">
             <div>
               <p className="text-xs text-slate-400 mb-1">Identificador único</p>

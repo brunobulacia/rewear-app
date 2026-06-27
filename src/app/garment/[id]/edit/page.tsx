@@ -8,9 +8,10 @@ import { api } from '@/lib/api';
 import { getStoredToken, getStoredUser } from '@/lib/auth';
 import { GarmentDetail } from '@/types';
 import { ArrowLeft, Save, ShieldCheck } from 'lucide-react';
+import { CATEGORIA_OPTIONS as CATEGORIAS } from '@/lib/categoria';
 
-const CATEGORIAS = ['Chaquetas','Vestidos','Calzado','Blazers','Sweaters','Accesorios','Pantalones','Camisas','Faldas','Abrigos','Otros'];
-const TALLAS     = ['XS','S','M','L','XL','XXL','36','37','38','39','40','41','42','43','Única'];
+const CONDICIONES = ['Nuevo con etiqueta','Nuevo sin etiqueta','Como nuevo','Usado - excelente','Usado - bueno','Usado - aceptable'];
+const TALLAS     = ['XS','S','M','L','XL','XXL','36','37','38','39','40','41','42','43','44','45','Única'];
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white placeholder:text-slate-400 disabled:bg-slate-50';
 
@@ -18,9 +19,12 @@ interface EditForm {
   titulo: string;
   descripcion: string;
   marca: string;
+  modelo: string;
+  colorway: string;
   estilo: string;
   categoria: string;
   talla: string;
+  condicion: string;
   precio: string;
 }
 
@@ -49,13 +53,16 @@ export default function EditGarmentPage() {
           titulo: g.titulo ?? '',
           descripcion: g.descripcion ?? '',
           marca: g.marca ?? '',
+          modelo: g.modelo ?? '',
+          colorway: g.colorway ?? '',
           estilo: g.estilo ?? '',
           categoria: g.categoria ?? '',
           talla: g.talla ?? '',
+          condicion: g.condicion ?? '',
           precio: String(g.precio ?? ''),
         });
       })
-      .catch(() => setError('No se pudo cargar la prenda.'))
+      .catch(() => setError('No se pudo cargar el producto.'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -75,16 +82,19 @@ export default function EditGarmentPage() {
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim() || undefined,
         marca: form.marca.trim() || undefined,
+        modelo: form.modelo.trim() || undefined,
+        colorway: form.colorway.trim() || undefined,
         estilo: form.estilo.trim() || undefined,
         categoria: form.categoria || undefined,
         talla: form.talla || undefined,
+        condicion: form.condicion || undefined,
         precio,
       });
       setSaved(true);
       setTimeout(() => router.push('/profile'), 1200);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : '';
-      setError(msg.includes('403') ? 'No podés editar una prenda que no es tuya.' : 'No se pudo guardar.');
+      setError(msg.includes('403') ? 'No podés editar un producto que no es tuyo.' : 'No se pudo guardar.');
     } finally {
       setSaving(false);
     }
@@ -103,7 +113,7 @@ export default function EditGarmentPage() {
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-xl border border-slate-200 p-10 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Conectá tu billetera</h2>
-          <p className="text-slate-500 text-sm">Necesitás iniciar sesión para editar una prenda.</p>
+          <p className="text-slate-500 text-sm">Necesitás iniciar sesión para editar un producto.</p>
         </div>
       </div>
     );
@@ -121,8 +131,8 @@ export default function EditGarmentPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-xl border border-slate-200 p-10 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">No es tu prenda</h2>
-          <p className="text-slate-500 text-sm mb-4">Solo el vendedor que la publicó puede editarla.</p>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">No es tu producto</h2>
+          <p className="text-slate-500 text-sm mb-4">Solo el vendedor que lo publicó puede editarlo.</p>
           <Link href="/profile" className="text-indigo-600 hover:underline text-sm font-medium">Volver a mi perfil</Link>
         </div>
       </div>
@@ -132,7 +142,7 @@ export default function EditGarmentPage() {
   if (!form || !garment) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center text-slate-500 text-sm">
-        {error || 'Prenda no encontrada.'}
+        {error || 'Producto no encontrado.'}
       </div>
     );
   }
@@ -143,9 +153,9 @@ export default function EditGarmentPage() {
         <ArrowLeft className="w-4 h-4" /> Volver a mi perfil
       </Link>
 
-      <h1 className="text-2xl font-bold text-slate-900 mb-1">Editar prenda</h1>
+      <h1 className="text-2xl font-bold text-slate-900 mb-1">Editar producto</h1>
       <p className="text-slate-500 text-sm mb-6">
-        Actualizá los datos de tu prenda. El pasaporte NFT y la verificación no se modifican.
+        Actualizá los datos de tu producto. El pasaporte NFT y la verificación no se modifican.
       </p>
 
       {saved && (
@@ -178,7 +188,7 @@ export default function EditGarmentPage() {
         <div>
           <label className="text-xs font-medium text-slate-500 block mb-1.5">Título *</label>
           <input type="text" value={form.titulo} onChange={(e) => set('titulo', e.target.value)}
-            placeholder="Ej: Chaqueta Levi's 501 Vintage" className={inputCls} />
+            placeholder="Ej: Nike Air Jordan 1 Retro High Bred" className={inputCls} />
         </div>
 
         <div>
@@ -191,12 +201,25 @@ export default function EditGarmentPage() {
           <div>
             <label className="text-xs font-medium text-slate-500 block mb-1.5">Marca</label>
             <input type="text" value={form.marca} onChange={(e) => set('marca', e.target.value)}
-              placeholder="Nike, Zara..." className={inputCls} />
+              placeholder="Nike, Jordan, Adidas..." className={inputCls} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-slate-500 block mb-1.5">Modelo</label>
+            <input type="text" value={form.modelo} onChange={(e) => set('modelo', e.target.value)}
+              placeholder="Air Jordan 1, Dunk Low..." className={inputCls} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-medium text-slate-500 block mb-1.5">Colorway</label>
+            <input type="text" value={form.colorway} onChange={(e) => set('colorway', e.target.value)}
+              placeholder="Bred, Panda..." className={inputCls} />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-500 block mb-1.5">Estilo</label>
             <input type="text" value={form.estilo} onChange={(e) => set('estilo', e.target.value)}
-              placeholder="Casual, formal..." className={inputCls} />
+              placeholder="Casual, retro..." className={inputCls} />
           </div>
         </div>
 
@@ -205,7 +228,7 @@ export default function EditGarmentPage() {
             <label className="text-xs font-medium text-slate-500 block mb-1.5">Categoría</label>
             <select value={form.categoria} onChange={(e) => set('categoria', e.target.value)} className={inputCls}>
               <option value="">Seleccionar...</option>
-              {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+              {CATEGORIAS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div>
@@ -215,6 +238,14 @@ export default function EditGarmentPage() {
               {TALLAS.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-slate-500 block mb-1.5">Condición</label>
+          <select value={form.condicion} onChange={(e) => set('condicion', e.target.value)} className={inputCls}>
+            <option value="">Seleccionar...</option>
+            {CONDICIONES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
 
         <div>

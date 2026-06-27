@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { categoriaLabel } from '@/lib/categoria';
 import { GarmentDetail } from '@/types';
 import { ShieldCheck, Lock, ArrowLeft, ChevronRight, Shirt } from 'lucide-react';
 
@@ -21,7 +22,7 @@ function CartContent() {
     if (!garmentId) { setLoading(false); return; }
     api.get<GarmentDetail>(`/garments/${garmentId}`)
       .then(setGarment)
-      .catch(() => setError('No se pudo cargar la prenda.'))
+      .catch(() => setError('No se pudo cargar el producto.'))
       .finally(() => setLoading(false));
   }, [garmentId]);
 
@@ -39,7 +40,7 @@ function CartContent() {
   if (error || !garment) {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <p className="text-red-500 mb-4">{error || 'Prenda no encontrada.'}</p>
+        <p className="text-red-500 mb-4">{error || 'Producto no encontrado.'}</p>
         <Link href="/catalog" className="text-indigo-600 hover:underline text-sm">Volver al catálogo</Link>
       </div>
     );
@@ -48,11 +49,11 @@ function CartContent() {
   if (garment.estado !== 'VERIFIED') {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <p className="text-slate-700 font-medium mb-2">Esta prenda no está disponible</p>
+        <p className="text-slate-700 font-medium mb-2">Este producto no está disponible</p>
         <p className="text-slate-500 text-sm mb-4">
           {garment.estado === 'SOLD' ? 'Ya fue vendida.' : 'No está verificada aún.'}
         </p>
-        <Link href="/catalog" className="text-indigo-600 hover:underline text-sm">Ver otras prendas</Link>
+        <Link href="/catalog" className="text-indigo-600 hover:underline text-sm">Ver otros productos</Link>
       </div>
     );
   }
@@ -84,7 +85,7 @@ function CartContent() {
           </div>
           <div className="flex-1 min-w-0">
             {garment.categoria && (
-              <p className="text-xs text-indigo-600 font-medium uppercase tracking-wide mb-0.5">{garment.categoria}</p>
+              <p className="text-xs text-indigo-600 font-medium uppercase tracking-wide mb-0.5">{categoriaLabel(garment.categoria)}</p>
             )}
             <h2 className="font-semibold text-slate-900 truncate">{garment.titulo}</h2>
             {garment.marca && (
@@ -120,18 +121,18 @@ function CartContent() {
         {/* Resumen */}
         <div className="px-5 py-4 space-y-2 text-sm">
           <div className="flex justify-between text-slate-600">
-            <span>Precio de la prenda</span>
+            <span>Precio del producto</span>
             <span>Bs. {garment.precio.toFixed(0)}</span>
           </div>
           <div className="flex justify-between text-slate-400">
-            <span>Comisión de plataforma (2.5%)</span>
-            <span>Bs. {(garment.precio * 0.025).toFixed(2)}</span>
+            <span>Comisión plataforma (3%) · la paga el vendedor</span>
+            <span>Bs. {(garment.precio * 0.03).toFixed(2)}</span>
           </div>
           <div className="border-t border-slate-100 pt-2 flex justify-between font-bold text-slate-900 text-base">
-            <span>Total (en cripto)</span>
+            <span>Total a pagar</span>
             <span>{maticAmount} ETH</span>
           </div>
-          <p className="text-xs text-slate-400">1 ETH ≈ Bs. {BOB_PER_ETH.toFixed(2)} (referencial)</p>
+          <p className="text-xs text-slate-400">Pagás el precio completo. 1 ETH ≈ Bs. {BOB_PER_ETH.toFixed(2)} (referencial)</p>
         </div>
 
         {/* Escrow info */}
@@ -157,7 +158,7 @@ function CartContent() {
             href={`/garment/${garment.id}`}
             className="flex items-center justify-center gap-1.5 w-full text-sm text-slate-500 hover:text-slate-700 transition-colors py-2"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Volver a la prenda
+            <ArrowLeft className="w-3.5 h-3.5" /> Volver al producto
           </Link>
         </div>
       </div>

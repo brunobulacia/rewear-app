@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, Search, X } from 'lucide-react';
+import { CATEGORIA_OPTIONS as CATEGORIAS } from '@/lib/categoria';
 
-const CATEGORIAS = ['Chaquetas', 'Vestidos', 'Calzado', 'Blazers', 'Sweaters', 'Pantalones', 'Camisas', 'Accesorios'];
-const TALLAS     = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43'];
+const TALLAS     = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-slate-900 placeholder:text-slate-400';
 
@@ -60,7 +60,7 @@ export function CatalogFilters() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-              placeholder="Nike, vestido floral..."
+              placeholder="Nike, Jordan, Dunk..."
               className={`${inputCls} pl-8`}
             />
           </div>
@@ -70,7 +70,7 @@ export function CatalogFilters() {
           <label className="text-xs font-medium text-slate-500 block mb-1.5">Categoría</label>
           <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className={inputCls}>
             <option value="">Todas</option>
-            {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+            {CATEGORIAS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
         </div>
 

@@ -32,9 +32,12 @@ export interface GarmentDetail {
   descripcion: string | null;
   precio: number;
   marca: string | null;
+  modelo: string | null;
+  colorway: string | null;
   talla: string | null;
   categoria: string | null;
   estilo: string | null;
+  condicion: string | null;
   imagenes: string[];
   estado: 'PENDING' | 'VERIFIED' | 'REJECTED' | 'SOLD';
   verificationStatus: 'PENDING' | 'IN_PROGRESS' | 'APPROVED' | 'REJECTED';

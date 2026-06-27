@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { getStoredToken, getStoredUser } from '@/lib/auth';
 import { Upload, Bot, Layers, Check, X, Camera, Wallet, ShieldCheck } from 'lucide-react';
+import { CATEGORIA_OPTIONS as CATEGORIAS } from '@/lib/categoria';
 
 const API_BASE   = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-const CATEGORIAS = ['Chaquetas','Vestidos','Calzado','Blazers','Sweaters','Accesorios','Pantalones','Camisas','Faldas','Abrigos','Otros'];
-const TALLAS     = ['XS','S','M','L','XL','XXL','36','37','38','39','40','41','42','43','Única'];
+const CONDICIONES = ['Nuevo con etiqueta','Nuevo sin etiqueta','Como nuevo','Usado - excelente','Usado - bueno','Usado - aceptable'];
+const TALLAS     = ['XS','S','M','L','XL','XXL','36','37','38','39','40','41','42','43','44','45','Única'];
 
 type Step = 'form' | 'uploading' | 'verifying' | 'approved' | 'error';
 
@@ -28,7 +29,8 @@ export default function SellPage() {
   const fileInputRef            = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    titulo: '', descripcion: '', marca: '', talla: '', categoria: '', estilo: '', precio: '',
+    titulo: '', descripcion: '', marca: '', modelo: '', colorway: '', talla: '',
+    categoria: '', estilo: '', condicion: '', precio: '',
   });
 
   // Evita el desajuste de hidratación: el estado de la wallet/sesión solo existe
@@ -50,9 +52,9 @@ export default function SellPage() {
             setTimeout(() => router.push(`/garment/${createdId}`), 2500);
           } else {
             const motivo = (data.verification?.dictamen || '')
-              .replace(/^RECHAZADA:\s*/i, '')
+              .replace(/^RECHAZAD[OA]:\s*/i, '')
               .trim();
-            setError(motivo || 'La imagen no parece ser una prenda de vestir.');
+            setError(motivo || 'La imagen no parece ser un producto de marca válido.');
             setStep('error');
           }
         }
@@ -120,7 +122,7 @@ export default function SellPage() {
     );
   }
 
-  // Los administradores no publican prendas — solo gestionan disputas.
+  // Los administradores no publican productos — solo gestionan disputas.
   if (user.rol === 'ADMIN') {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
@@ -129,7 +131,7 @@ export default function SellPage() {
             <ShieldCheck className="w-7 h-7 text-indigo-600" />
           </div>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Cuenta de administrador</h2>
-          <p className="text-slate-500 text-sm mb-4">Los administradores no publican prendas. Tu rol es gestionar disputas.</p>
+          <p className="text-slate-500 text-sm mb-4">Los administradores no publican productos. Tu rol es gestionar disputas.</p>
           <a href="/admin" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
             Ir al Panel de Disputas
           </a>
@@ -157,7 +159,7 @@ export default function SellPage() {
             <p className="text-slate-500 text-sm mb-6">Nuestra IA está analizando las imágenes para verificar autenticidad y estado.</p>
           )}
           {step === 'approved' && (
-            <p className="text-slate-500 text-sm mb-6">Prenda aprobada. Emitiendo pasaporte digital en Ethereum. Redirigiendo...</p>
+            <p className="text-slate-500 text-sm mb-6">Producto aprobado. Emitiendo pasaporte digital en Ethereum. Redirigiendo...</p>
           )}
           <div className="flex items-center justify-center gap-2 mt-6">
             {stages.map((s, i) => (
@@ -189,7 +191,7 @@ export default function SellPage() {
           </div>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">La IA rechazó la imagen</h2>
           <p className="text-slate-500 text-sm mb-4">
-            Solo se pueden publicar prendas de vestir, calzado o accesorios de moda.
+            Solo se pueden publicar productos de marca: zapatillas, prendas, gorras o mochilas/bolsos.
           </p>
           <div className="bg-red-50 border border-red-100 rounded-lg px-4 py-3 mb-6 text-left">
             <p className="text-xs font-medium text-red-400 mb-1">Veredicto de la IA</p>
@@ -209,9 +211,9 @@ export default function SellPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Publicar prenda</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Publicar producto</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Subí fotos y completá los datos. La IA verificará tu prenda y se emitirá un pasaporte NFT en Ethereum.
+          Subí fotos y completá los datos. La IA verificará tu producto y se emitirá un pasaporte NFT en Ethereum.
         </p>
       </div>
 
@@ -221,7 +223,7 @@ export default function SellPage() {
         <div className="space-y-5 lg:sticky lg:top-8">
         {/* Upload */}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 mb-1">Fotos de la prenda</h2>
+          <h2 className="font-semibold text-slate-900 mb-1">Fotos del producto</h2>
           <p className="text-xs text-slate-400 mb-4">Hasta 5 fotos. Incluí etiquetas y detalles.</p>
           <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
           {previews.length === 0 ? (
@@ -256,7 +258,7 @@ export default function SellPage() {
           <ol className="text-xs text-indigo-700 space-y-1.5">
             <li className="flex items-start gap-2"><Bot className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span><strong>IA analiza</strong> tus fotos y verifica autenticidad y estado</span></li>
             <li className="flex items-start gap-2"><ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>Si es aprobada, se genera un <strong>pasaporte digital NFT</strong> en Ethereum</span></li>
-            <li className="flex items-start gap-2"><Layers className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>La prenda aparece en el <strong>catálogo</strong> para compradores</span></li>
+            <li className="flex items-start gap-2"><Layers className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span>El producto aparece en el <strong>catálogo</strong> para compradores</span></li>
           </ol>
         </div>
         </div>{/* fin columna izquierda */}
@@ -265,12 +267,12 @@ export default function SellPage() {
         <div className="space-y-5">
         {/* Datos */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-          <h2 className="font-semibold text-slate-900">Datos de la prenda</h2>
+          <h2 className="font-semibold text-slate-900">Datos del producto</h2>
 
           <div>
             <label className="text-xs font-medium text-slate-500 block mb-1.5">Título <span className="text-red-500">*</span></label>
             <input type="text" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-              placeholder="Ej: Chaqueta Levi's 501 Vintage" className={inputCls} required />
+              placeholder="Ej: Nike Air Jordan 1 Retro High Bred" className={inputCls} required />
           </div>
 
           <div>
@@ -284,12 +286,25 @@ export default function SellPage() {
             <div>
               <label className="text-xs font-medium text-slate-500 block mb-1.5">Marca</label>
               <input type="text" value={form.marca} onChange={(e) => setForm({ ...form, marca: e.target.value })}
-                placeholder="Nike, Zara..." className={inputCls} />
+                placeholder="Nike, Jordan, Adidas..." className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-500 block mb-1.5">Modelo</label>
+              <input type="text" value={form.modelo} onChange={(e) => setForm({ ...form, modelo: e.target.value })}
+                placeholder="Air Jordan 1, Dunk Low..." className={inputCls} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-medium text-slate-500 block mb-1.5">Colorway</label>
+              <input type="text" value={form.colorway} onChange={(e) => setForm({ ...form, colorway: e.target.value })}
+                placeholder="Bred, Panda..." className={inputCls} />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-500 block mb-1.5">Estilo</label>
               <input type="text" value={form.estilo} onChange={(e) => setForm({ ...form, estilo: e.target.value })}
-                placeholder="Casual, formal..." className={inputCls} />
+                placeholder="Casual, retro..." className={inputCls} />
             </div>
           </div>
 
@@ -298,7 +313,7 @@ export default function SellPage() {
               <label className="text-xs font-medium text-slate-500 block mb-1.5">Categoría</label>
               <select value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} className={inputCls}>
                 <option value="">Seleccionar...</option>
-                {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIAS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>
@@ -308,6 +323,14 @@ export default function SellPage() {
                 {TALLAS.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-slate-500 block mb-1.5">Condición</label>
+            <select value={form.condicion} onChange={(e) => setForm({ ...form, condicion: e.target.value })} className={inputCls}>
+              <option value="">Seleccionar...</option>
+              {CONDICIONES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
 
           <div>
@@ -324,7 +347,7 @@ export default function SellPage() {
         )}
 
         <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
-          Publicar y verificar prenda
+          Publicar y verificar producto
         </button>
         </div>{/* fin columna derecha */}
         </div>{/* fin grid */}

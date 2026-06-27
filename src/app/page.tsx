@@ -32,7 +32,7 @@ export default async function HomePage() {
             <span className="text-indigo-600">con autenticidad garantizada.</span>
           </h1>
           <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto">
-            Cada prenda verificada por IA, tokenizada como NFT y protegida por escrow en Ethereum.
+            Cada producto verificado por IA, tokenizada como NFT y protegida por escrow en Ethereum.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -45,19 +45,19 @@ export default async function HomePage() {
               href="/sell"
               className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 px-7 py-3 rounded-lg font-semibold transition-colors"
             >
-              Publicar prenda
+              Publicar producto
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Prendas recientes */}
+      {/* Productos recientes */}
       {garments.length > 0 && (
         <section className="py-14 px-4 bg-slate-50">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Últimas prendas verificadas</h2>
+                <h2 className="text-xl font-bold text-slate-900">Últimos productos verificados</h2>
                 <p className="text-slate-500 text-sm mt-1">Pasaporte digital en Ethereum para cada una</p>
               </div>
               <Link href="/catalog" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
@@ -83,12 +83,12 @@ export default async function HomePage() {
               {
                 icon: <Bot className="w-6 h-6 text-indigo-600" />,
                 title: 'Verificación IA',
-                desc: 'Nuestra IA analiza las fotos de cada prenda para verificar su autenticidad y evaluar el nivel de desgaste.',
+                desc: 'Nuestra IA analiza las fotos de cada producto para verificar su autenticidad y evaluar el nivel de desgaste.',
               },
               {
                 icon: <Layers className="w-6 h-6 text-indigo-600" />,
                 title: 'Pasaporte NFT',
-                desc: 'Cada prenda aprobada recibe un pasaporte digital inmutable en Ethereum. El historial es público y verificable.',
+                desc: 'Cada producto aprobado recibe un pasaporte digital inmutable en Ethereum. El historial es público y verificable.',
               },
               {
                 icon: <Lock className="w-6 h-6 text-indigo-600" />,
@@ -121,7 +121,7 @@ export default async function HomePage() {
             href="/sell"
             className="inline-flex items-center gap-2 bg-white text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-lg font-semibold transition-colors"
           >
-            Publicar una prenda <ArrowRight className="w-4 h-4" />
+            Publicar un producto <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>

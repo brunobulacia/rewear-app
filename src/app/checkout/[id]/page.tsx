@@ -12,7 +12,7 @@ import { GarmentDetail } from '@/types';
 
 // Bs por 1 ETH de Sepolia. Default alto a propósito: si la env no se setea en el
 // deploy, el monto resultante es chico (afordable en testnet). Un default bajo
-// (ej. 3.5) haría que una prenda de Bs 250 intente enviar ~71 ETH y rompa la compra.
+// (ej. 3.5) haría que un producto de Bs 250 intente enviar ~71 ETH y rompa la compra.
 const BOB_PER_ETH = parseFloat(process.env.NEXT_PUBLIC_BOB_PER_ETH || '20000');
 
 type Step = 'review' | 'signing' | 'confirming' | 'registering' | 'success' | 'error';
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
     api.get<GarmentDetail>(`/garments/${id}`)
       .then(setGarment)
       .catch(() => {
-        setErrorMsg('No se pudo cargar la prenda.');
+        setErrorMsg('No se pudo cargar el producto.');
         setStep('error');
       });
   }, [id]);
@@ -107,12 +107,12 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">¡Pago exitoso!</h1>
         <p className="text-gray-500 text-sm mb-6">
-          Tu pago está retenido en el escrow. Cuando recibas la prenda confirmá la entrega
+          Tu pago está retenido en el escrow. Cuando recibas el producto confirmá la entrega
           para liberar los fondos al vendedor.
         </p>
         <div className="bg-gray-50 rounded-xl px-5 py-4 text-left mb-6 text-sm space-y-1.5">
           <p className="text-gray-500">
-            Prenda: <span className="text-gray-900 font-medium">{garment.titulo}</span>
+            Producto: <span className="text-gray-900 font-medium">{garment.titulo}</span>
           </p>
           <p className="text-gray-500">
             Monto: <span className="text-gray-900 font-medium">{maticAmount} ETH</span>
@@ -188,24 +188,29 @@ export default function CheckoutPage() {
           <hr className="border-gray-100" />
           <div className="px-5 py-3 text-sm space-y-1.5">
             <div className="flex justify-between text-gray-500">
-              <span>Subtotal</span>
+              <span>Precio del producto</span>
               <span>Bs. {garment.precio.toFixed(0)}</span>
             </div>
-            <div className="flex justify-between text-gray-500">
-              <span>Comisión (2.5%)</span>
-              <span>Bs. {(garment.precio * 0.025).toFixed(2)}</span>
+            <div className="flex justify-between text-gray-400">
+              <span>Comisión plataforma (3%) · la paga el vendedor</span>
+              <span>Bs. {(garment.precio * 0.03).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-gray-400">
+              <span>El vendedor recibe</span>
+              <span>Bs. {(garment.precio * 0.97).toFixed(2)}</span>
             </div>
             <hr className="border-gray-100" />
             <div className="flex justify-between font-bold text-gray-900">
               <span>Total a pagar</span>
               <span>{maticAmount} ETH</span>
             </div>
+            <p className="text-xs text-gray-400">Pagás el precio completo; la comisión se descuenta al vendedor.</p>
           </div>
         </div>
       ) : (
         !errorMsg && (
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-4 text-center text-gray-400 text-sm">
-            Cargando prenda...
+            Cargando producto...
           </div>
         )
       )}
@@ -277,7 +282,7 @@ export default function CheckoutPage() {
 
       <p className="mt-4 text-xs text-center text-gray-400">
         Los fondos se bloquean en el contrato hasta que confirmes la entrega.
-        La comisión del 2.5% se descuenta al momento de liberar los fondos.
+        La comisión del 3% se descuenta al vendedor al momento de liberar los fondos.
       </p>
     </div>
   );

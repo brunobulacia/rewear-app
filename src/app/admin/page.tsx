@@ -108,8 +108,8 @@ export default function AdminPage() {
 
   const statCards = [
     { label: 'Usuarios',                 value: stats?.totalUsers,            icon: <Users className="w-4 h-4" />,          color: 'text-slate-900' },
-    { label: 'Prendas totales',          value: stats?.totalGarments,         icon: <Shirt className="w-4 h-4" />,          color: 'text-slate-900' },
-    { label: 'Prendas verificadas',      value: stats?.verifiedGarments,      icon: <CheckCircle className="w-4 h-4" />,    color: 'text-indigo-600' },
+    { label: 'Productos totales',          value: stats?.totalGarments,         icon: <Shirt className="w-4 h-4" />,          color: 'text-slate-900' },
+    { label: 'Productos verificados',      value: stats?.verifiedGarments,      icon: <CheckCircle className="w-4 h-4" />,    color: 'text-indigo-600' },
     { label: 'Transacciones activas',    value: stats?.activeTransactions,    icon: <ArrowRightLeft className="w-4 h-4" />, color: 'text-blue-600' },
     { label: 'Transacciones completadas',value: stats?.completedTransactions, icon: <CheckCircle className="w-4 h-4" />,    color: 'text-emerald-600' },
     { label: 'Disputas abiertas',        value: stats?.openDisputes,          icon: <AlertTriangle className="w-4 h-4" />,  color: (stats?.openDisputes ?? 0) > 0 ? 'text-red-600' : 'text-slate-900' },

@@ -40,7 +40,7 @@ export default function FavoritesPage() {
             <Heart className="w-7 h-7 text-red-400" />
           </div>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Conectá tu billetera</h2>
-          <p className="text-slate-500 text-sm">Iniciá sesión para ver y guardar tus prendas favoritas.</p>
+          <p className="text-slate-500 text-sm">Iniciá sesión para ver y guardar tus productos favoritos.</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ export default function FavoritesPage() {
         <Heart className="w-6 h-6 text-red-500 fill-red-500" />
         <h1 className="text-2xl font-bold text-slate-900">Mis Favoritos</h1>
       </div>
-      <p className="text-slate-500 text-sm mb-6">Las prendas que guardaste para no perderlas de vista.</p>
+      <p className="text-slate-500 text-sm mb-6">Los productos que guardaste para no perderlas de vista.</p>
 
       {loading ? (
         <div className="flex justify-center py-16 text-slate-400">
@@ -63,7 +63,7 @@ export default function FavoritesPage() {
           <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <Heart className="w-6 h-6 text-slate-300" />
           </div>
-          <p className="text-slate-500 text-sm">Todavía no guardaste ninguna prenda.</p>
+          <p className="text-slate-500 text-sm">Todavía no guardaste ningún producto.</p>
           <Link href="/catalog" className="mt-2 inline-block text-sm text-indigo-600 hover:underline font-medium">
             Explorar el catálogo
           </Link>

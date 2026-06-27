@@ -56,7 +56,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Catálogo</h1>
           <p className="text-gray-500 text-sm mt-1">
-            {meta.total} prenda{meta.total !== 1 ? 's' : ''} verificada{meta.total !== 1 ? 's' : ''}
+            {meta.total} producto{meta.total !== 1 ? 's' : ''} verificado{meta.total !== 1 ? 's' : ''}
             {hasFilters && ' · Resultados filtrados'}
           </p>
         </div>
@@ -77,7 +77,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div className="flex-1">
           {garments.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
-              <p className="text-lg font-medium">No se encontraron prendas</p>
+              <p className="text-lg font-medium">No se encontraron productos</p>
               <p className="text-sm mt-1">Intenta con otros filtros</p>
             </div>
           ) : (
@@ -118,74 +118,74 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 const MOCK_GARMENTS: Garment[] = [
   {
     id: '1',
-    titulo: "Chaqueta Levi's 501 Vintage",
-    precio: 250,
-    marca: "Levi's",
-    talla: 'M',
-    categoria: 'Chaquetas',
-    imagenes: ['https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400'],
-    verificationStatus: 'APPROVED',
-    seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Excelente', authenticityPct: 95 },
-  },
-  {
-    id: '2',
-    titulo: 'Vestido Floral Zara',
-    precio: 120,
-    marca: 'Zara',
-    talla: 'S',
-    categoria: 'Vestidos',
-    imagenes: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400'],
-    verificationStatus: 'APPROVED',
-    seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Muy bueno', authenticityPct: 92 },
-  },
-  {
-    id: '3',
-    titulo: 'Zapatillas Nike Air Max 90',
+    titulo: 'Nike Air Jordan 1 Retro High Bred',
     precio: 380,
-    marca: 'Nike',
+    marca: 'Jordan',
     talla: '42',
-    categoria: 'Calzado',
+    categoria: 'ZAPATILLAS',
     imagenes: ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'],
     verificationStatus: 'APPROVED',
     seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Muy bueno', authenticityPct: 98 },
+    verification: { wearLevel: 'Excelente', authenticityPct: 98 },
+  },
+  {
+    id: '2',
+    titulo: 'Nike Dunk Low Panda',
+    precio: 250,
+    marca: 'Nike',
+    talla: '40',
+    categoria: 'ZAPATILLAS',
+    imagenes: ['https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=400'],
+    verificationStatus: 'APPROVED',
+    seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
+    verification: { wearLevel: 'Muy bueno', authenticityPct: 95 },
+  },
+  {
+    id: '3',
+    titulo: 'New Balance 550 White Green',
+    precio: 290,
+    marca: 'New Balance',
+    talla: '43',
+    categoria: 'ZAPATILLAS',
+    imagenes: ['https://images.unsplash.com/photo-1539185441755-769473a23570?w=400'],
+    verificationStatus: 'APPROVED',
+    seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
+    verification: { wearLevel: 'Muy bueno', authenticityPct: 96 },
   },
   {
     id: '4',
-    titulo: 'Blazer H&M Negro',
+    titulo: 'Hoodie The North Face Negro',
     precio: 180,
-    marca: 'H&M',
+    marca: 'The North Face',
     talla: 'L',
-    categoria: 'Blazers',
-    imagenes: ['https://images.unsplash.com/photo-1594938298603-c8148c4b3571?w=400'],
+    categoria: 'PRENDAS',
+    imagenes: ['https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400'],
     verificationStatus: 'APPROVED',
     seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Excelente', authenticityPct: 91 },
+    verification: { wearLevel: 'Excelente', authenticityPct: 92 },
   },
   {
     id: '5',
-    titulo: 'Sweater Oversized Vintage',
+    titulo: 'Gorra New Era NY Yankees',
     precio: 95,
-    marca: 'Sin marca',
+    marca: 'New Era',
     talla: 'Única',
-    categoria: 'Sweaters',
-    imagenes: ['https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?w=400'],
+    categoria: 'GORRAS',
+    imagenes: ['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400'],
     verificationStatus: 'APPROVED',
     seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Bueno', authenticityPct: 88 },
+    verification: { wearLevel: 'Bueno', authenticityPct: 90 },
   },
   {
     id: '6',
-    titulo: 'Bolso Coach Signature',
-    precio: 650,
-    marca: 'Coach',
+    titulo: 'Mochila Herschel Little America',
+    precio: 220,
+    marca: 'Herschel',
     talla: 'Única',
-    categoria: 'Accesorios',
-    imagenes: ['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400'],
+    categoria: 'MOCHILAS',
+    imagenes: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'],
     verificationStatus: 'APPROVED',
     seller: { id: '1', walletAddress: '0x123', nombre: 'ReWear Demo', avatar: null },
-    verification: { wearLevel: 'Excelente', authenticityPct: 99 },
+    verification: { wearLevel: 'Excelente', authenticityPct: 97 },
   },
 ];
