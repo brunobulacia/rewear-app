@@ -3,6 +3,7 @@ import './globals.css';
 import { Web3Provider } from '@/providers/web3-provider';
 import { Header } from '@/components/layout/Header';
 import { TermsModal } from '@/components/TermsModal';
+import { ChatWidget } from '@/components/ChatWidget';
 
 
 
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ReWear © 2025 — Plataforma Descentralizada de Moda Circular
             </div>
           </footer>
+          <ChatWidget />
         </Web3Provider>
       </body>
     </html>
