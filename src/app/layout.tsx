@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="flex-1">{children}</main>
           <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
             <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-400">
-              ReWear © 2025 — Plataforma Descentralizada de Moda Circular
+              ReWear © 2026 — Plataforma Descentralizada de Moda Circular
             </div>
           </footer>
           <ChatWidget />
