@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { getStoredToken, getStoredUser } from '@/lib/auth';
-import { Upload, Bot, Layers, Check, X, Camera, Wallet, ShieldCheck } from 'lucide-react';
+import { Upload, Bot, Layers, Check, X, Camera, Wallet, ShieldCheck, Sparkles } from 'lucide-react';
 import { CATEGORIA_OPTIONS as CATEGORIAS } from '@/lib/categoria';
 
 const API_BASE   = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
@@ -26,6 +26,7 @@ export default function SellPage() {
   const [error, setError]       = useState('');
   const [previews, setPreviews] = useState<string[]>([]);
   const [files, setFiles]       = useState<File[]>([]);
+  const [autofilling, setAutofilling] = useState(false);
   const fileInputRef            = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
@@ -68,6 +69,51 @@ export default function SellPage() {
     const valid = Array.from(selected).filter((f) => f.type.startsWith('image/')).slice(0, 5);
     setFiles(valid);
     setPreviews(valid.map((f) => URL.createObjectURL(f)));
+  };
+
+  // Convierte un File a base64 (sin el prefijo data:...;base64,) para la IA.
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  // Pide a la IA que extraiga los datos del producto desde las fotos y prellena el form.
+  const handleAutofill = async () => {
+    if (!files.length || autofilling) return;
+    setError('');
+    setAutofilling(true);
+    try {
+      const images = await Promise.all(
+        files.slice(0, 4).map(async (f) => ({ media_type: f.type, data: await fileToBase64(f) })),
+      );
+      const res  = await fetch('/api/autofill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'No se pudo completar con IA.');
+      const f = data.fields || {};
+      setForm((prev) => ({
+        ...prev,
+        titulo:      f.titulo || prev.titulo,
+        descripcion: f.descripcion || prev.descripcion,
+        marca:       f.marca || prev.marca,
+        modelo:      f.modelo || prev.modelo,
+        colorway:    f.colorway || prev.colorway,
+        estilo:      f.estilo || prev.estilo,
+        talla:       TALLAS.includes(f.talla) ? f.talla : prev.talla,
+        categoria:   CATEGORIAS.some((c) => c.value === f.categoria) ? f.categoria : prev.categoria,
+        condicion:   CONDICIONES.includes(f.condicion) ? f.condicion : prev.condicion,
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al completar con IA.');
+    } finally {
+      setAutofilling(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -248,6 +294,28 @@ export default function SellPage() {
               <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-indigo-600 hover:underline">
                 Cambiar fotos
               </button>
+
+              {/* Rellenar con IA */}
+              <button
+                type="button"
+                onClick={handleAutofill}
+                disabled={autofilling}
+                className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-200 text-indigo-700 py-2.5 rounded-lg font-semibold text-sm transition-colors"
+              >
+                {autofilling ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    Analizando fotos...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" /> Rellenar datos con IA
+                  </>
+                )}
+              </button>
+              <p className="text-[11px] text-slate-400 mt-1.5 text-center">
+                La IA completa título, marca, modelo y más a partir de tus fotos. Revisalos antes de publicar.
+              </p>
             </div>
           )}
         </div>

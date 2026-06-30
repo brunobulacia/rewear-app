@@ -3,18 +3,13 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { GarmentDetail } from '@/types';
 import { categoriaLabel } from '@/lib/categoria';
-import { ShieldCheck, Layers, ChevronRight, Shirt, Bot, ExternalLink, ShoppingBag, Lock } from 'lucide-react';
+import { ShieldCheck, Layers, ChevronRight, Bot, ExternalLink, ShoppingBag, Lock } from 'lucide-react';
 import { NftHistory } from '@/components/garment/NftHistory';
+import { GarmentGallery } from '@/components/garment/GarmentGallery';
 import { ReputationBadge } from '@/components/ReputationBadge';
 
 const API_BASE      = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 const NFT_CONTRACT  = process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS;
-
-const wearColors: Record<string, string> = {
-  Excelente:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Muy bueno': 'bg-blue-50 text-blue-700 border-blue-200',
-  Bueno:       'bg-amber-50 text-amber-700 border-amber-200',
-};
 
 /** Tarjeta con un estilo consistente para todas las secciones de confianza. */
 function SectionCard({ icon, title, subtitle, children }: {
@@ -60,7 +55,6 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
 
   if (!garment) notFound();
 
-  const mainImage = garment.imagenes[0];
   const wearLevel = garment.verification?.wearLevel;
   const shortAddr = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
@@ -74,35 +68,8 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Imágenes */}
-        <div className="space-y-3 lg:sticky lg:top-8">
-          <div className="relative aspect-square bg-slate-100 rounded-xl overflow-hidden">
-            {mainImage ? (
-              <img src={mainImage} alt={garment.titulo} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Shirt className="w-16 h-16 text-slate-300" />
-              </div>
-            )}
-            <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-slate-200 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-medium">
-              <ShieldCheck className="w-3.5 h-3.5" /> Verificado
-            </div>
-            {wearLevel && (
-              <div className={`absolute top-3 right-3 text-xs px-2.5 py-1 rounded-full font-medium border ${wearColors[wearLevel] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
-                {wearLevel}
-              </div>
-            )}
-          </div>
-          {garment.imagenes.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {garment.imagenes.slice(0, 4).map((img, i) => (
-                <div key={i} className="aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                  <img src={img} alt={`${garment.titulo} ${i + 1}`} className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Imágenes — carousel */}
+        <GarmentGallery imagenes={garment.imagenes} titulo={garment.titulo} wearLevel={wearLevel} />
 
         {/* Info */}
         <div className="flex flex-col gap-5">
