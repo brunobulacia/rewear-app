@@ -60,9 +60,9 @@ export function FavoriteButton({ garmentId, size = 'md' }: { garmentId: string; 
       disabled={busy}
       aria-label={fav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
       aria-pressed={fav}
-      className={`${dim} flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm hover:bg-white transition-colors disabled:opacity-60`}
+      className={`${dim} flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-60`}
     >
-      <Heart className={`${icon} transition-colors ${fav ? 'fill-red-500 text-red-500' : 'text-slate-500'}`} />
+      <Heart className={`${icon} transition-colors ${fav ? 'fill-red-500 text-red-500' : 'text-slate-500 dark:text-slate-300'}`} />
     </button>
   );
 }

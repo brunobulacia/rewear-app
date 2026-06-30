@@ -4,9 +4,9 @@ import { ShieldCheck, Shirt } from 'lucide-react';
 import { FavoriteButton } from './FavoriteButton';
 
 const wearColors: Record<string, string> = {
-  Excelente:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Muy bueno': 'bg-blue-50 text-blue-700 border-blue-200',
-  Bueno:       'bg-amber-50 text-amber-700 border-amber-200',
+  Excelente:   'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30',
+  'Muy bueno': 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30',
+  Bueno:       'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30',
 };
 
 export function GarmentCard({ garment }: { garment: Garment }) {
@@ -28,12 +28,12 @@ export function GarmentCard({ garment }: { garment: Garment }) {
               <Shirt className="w-12 h-12 text-slate-300" />
             </div>
           )}
-          <div className="absolute top-2 left-2 flex items-center gap-1 bg-white/90 backdrop-blur-sm border border-slate-200 text-indigo-700 text-xs px-2 py-1 rounded-full font-medium">
+          <div className="absolute top-2 left-2 flex items-center gap-1 bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-1 rounded-full font-medium">
             <ShieldCheck className="w-3 h-3" />
             Verificado
           </div>
           {wearLevel && (
-            <div className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium border ${wearColors[wearLevel] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+            <div className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium border ${wearColors[wearLevel] || 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'}`}>
               {wearLevel}
             </div>
           )}
