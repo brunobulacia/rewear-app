@@ -31,9 +31,9 @@ function SectionCard({ icon, title, subtitle, children }: {
 
 function Attr({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex-1 min-w-[90px] rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5">
+    <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5">
       <p className="text-xs text-slate-400">{label}</p>
-      <p className="text-sm font-semibold text-slate-900 truncate">{value}</p>
+      <p className="text-sm font-semibold text-slate-900 break-words">{value}</p>
     </div>
   );
 }
@@ -113,7 +113,7 @@ export default async function GarmentDetailPage({ params }: { params: Promise<{ 
 
           {/* Atributos */}
           {(garment.marca || garment.modelo || garment.colorway || garment.talla || garment.estilo || garment.condicion) && (
-            <div className="flex flex-wrap gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {garment.marca && <Attr label="Marca" value={garment.marca} />}
               {garment.modelo && <Attr label="Modelo" value={garment.modelo} />}
               {garment.colorway && <Attr label="Colorway" value={garment.colorway} />}
