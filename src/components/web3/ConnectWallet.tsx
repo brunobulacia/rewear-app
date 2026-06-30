@@ -96,7 +96,7 @@ export function ConnectWallet() {
             {connectError.message.toLowerCase().includes('provider') ||
              connectError.message.toLowerCase().includes('not found') ||
              connectError.message.toLowerCase().includes('injected')
-              ? 'No se detectó billetera. Instalá MetaMask.'
+              ? 'Necesitas instalar la extensión Metamask de Google.'
               : connectError.message}
           </span>
         )}
